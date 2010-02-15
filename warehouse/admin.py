@@ -1,7 +1,7 @@
 ##
 ## admin.py
 ## Author : <shashi@inf.in>
-## Started on  Wed Feb 10 15:38:26 2010 Shashishekhar S
+## Started on  Fri Feb 12 12:03:57 2010 Shashishekhar S
 ## $Id$
 ## 
 ## Copyright (C) 2010 INFORMEDIA
@@ -20,15 +20,8 @@
 ## Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 ##
 
-from junxon.checkin.models import Subscriber
+from junxon.warehouse.models import IPAddressPool
 from django.contrib import admin
 
-class SubscriberAdmin(admin.ModelAdmin):
-    list_display = ('name','email','mobile')
-    ordering = ['name']
-    list_per_page = 50
-    search_fields = ['name','email']
-#     fields = ('accesskey', 'ipaddress')
+admin.site.register(IPAddressPool)
 
-
-admin.site.register(Subscriber, SubscriberAdmin)
