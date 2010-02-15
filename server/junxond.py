@@ -23,44 +23,28 @@
 
 
 # Pyro Server for libJunxon
-
-import sys
-import Pyro.naming
 import Pyro.core
-from Pyro.errors import PyroError,NamingError
-
+import Pyro.naming
+from Pyro.errors import NamingError
 from junxon import Junxon
 
-group = ':junxon-service'   
+class Junxond(Pyro.core.ObjBase, Junxon):
+        def __init__(self):
+                Pyro.core.ObjBase.__init__(self)
 
-Pyro.config.PYRO_PORT=Pyro.config.PYRO_PORT+1
-
-# initialize the server and set the default namespace group
 Pyro.core.initServer()
-Pyro.config.PYRO_NS_DEFAULTGROUP=group
 
-# locate the NS
-print 'Searching Naming Service...'
-daemon = Pyro.core.Daemon()
-locator = Pyro.naming.NameServerLocator()
-ns = locator.getNS()
+ns=Pyro.naming.NameServerLocator().getNS()
 
-
-# make sure our namespace group exists
-try:
-	ns.createGroup(group)
-except NamingError:
-	pass
-
+daemon=Pyro.core.Daemon()
 daemon.useNameServer(ns)
 
-# use Delegation approach for object implementation
-obj1=Pyro.core.ObjBase()
-obj1.delegateTo((Junxon))
-daemon.connect(obj1,'Junxon')
+try:
+        ns.unregister(':junxon-service.Junxon')
+        ns.createGroup(":junxon-service")
+except NamingError:
+    pass
+uri=daemon.connect(Junxond(),":junxon-service.Junxon")
 
-# enter the service loop.
-print 'Junxon ready!'
+print "Starting junxond...",
 daemon.requestLoop()
-
-

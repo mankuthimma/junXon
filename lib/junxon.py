@@ -31,6 +31,9 @@ conf.verb = 0                           # Turn off verbose reporting by Scapy
 class Junxon:
     """ The Junxon helper library. Provides a set of utilities to manage connection requests
         and connections itself. Has to run as root. """
+
+    _dhcpd_conf = "/opt/junxon/cache/dhcpd.conf"
+    _dhcpd_init = "/etc/init.d/dhcp3-server"
     
     def __init__(self):
         """ TODO: Move configuration params to a configfile """
