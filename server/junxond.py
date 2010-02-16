@@ -6,47 +6,47 @@
 ## $Id$
 ## 
 ## Copyright (C) 2010 INFORMEDIA
-## This program is free software; you can redistribute it and/or modify
-## it under the terms of the GNU General Public License as published by
-## the Free Software Foundation; either version 2 of the License, or
-## (at your option) any later version.
-## 
-## This program is distributed in the hope that it will be useful,
-## but WITHOUT ANY WARRANTY; without even the implied warranty of
-## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-## GNU General Public License for more details.
-## 
-## You should have received a copy of the GNU General Public License
-## along with this program; if not, write to the Free Software
-## Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
-##
 
 
 # Pyro Server for libJunxon
-import Pyro.core
-import Pyro.naming
 from Pyro.errors import NamingError
+import Pyro.core, Pyro.naming, Pyro.util
+
 from junxon import Junxon
+
+JUNXON_GROUP = ":Junxon"
+JUNXON_NAME = JUNXON_GROUP+".Server"
+
 
 class Junxond(Pyro.core.ObjBase, Junxon):
         def __init__(self):
                 Pyro.core.ObjBase.__init__(self)
+                Junxon.__init__(self)
+                
 
-Pyro.core.initServer()
 
-ns=Pyro.naming.NameServerLocator().getNS()
+def main():
+	Pyro.core.initServer()
+	daemon = Pyro.core.Daemon()
+	ns = Pyro.naming.NameServerLocator().getNS()
+	daemon.useNameServer(ns)
 
-daemon=Pyro.core.Daemon()
-daemon.useNameServer(ns)
+	# make sure our namespace group exists, and that our object name doesn't
+	try:
+		ns.createGroup(JUNXON_GROUP)
+	except NamingError:
+		pass
+	try:
+		ns.unregister(JUNXON_NAME)
+	except NamingError:
+		pass
 
-try:
-        ns.unregister(':junxon-service.Junxon')
-        ns.createGroup(":junxon-service")
-except NamingError:
-        pass
+	uri=daemon.connect(Junxond(),JUNXON_NAME)
 
-uri=daemon.connect(Junxond(),":junxon-service.Junxon")
+	# enter the service loop.
+	print 'Junxon Ready...'
+	daemon.requestLoop()
 
-print "junxond... ready",
-daemon.requestLoop()
 
+if __name__=='__main__':
+	main()

@@ -31,14 +31,12 @@ conf.verb = 0                           # Turn off verbose reporting by Scapy
 class Junxon:
     """ The Junxon helper library. Provides a set of utilities to manage connection requests
         and connections itself. Has to run as root. """
-
-#     _dhcpd_conf = "/opt/junxon/cache/dhcpd.conf"
-#     _dhcpd_init = "/etc/init.d/dhcp3-server"
     
     def __init__(self):
         """ TODO: Move configuration params to a configfile """
         self._dhcpd_conf = "/opt/junxon/cache/dhcpd.conf"
         self._dhcpd_init = "/etc/init.d/dhcp3-server"
+        self.ip_pool = "192.168.1."
 
     def get_mac_address(self, ip):
         ans,unans = srp(Ether(dst="ff:ff:ff:ff:ff:ff")/ARP(pdst=ip),timeout=3,iface="eth1")
@@ -86,7 +84,6 @@ class Junxon:
             match = expr.search(l)
             if match != None:
                 return True
-        self.restart_dhcpd()        
         return False
 
     def remove_dhcp_record_by_ip(self, ip):
@@ -136,9 +133,30 @@ class Junxon:
             return False
 
     def next_ip_address(self):
+        expr = r'fixed-address (.*);'
         f=open(self._dhcpd_conf,'r')
         ll = f.readlines()
+        ip_addresses = []
+        for l in ll:
+            m = re.findall(expr, l)
+            if m[0] is not None:
+                lq = int(m[0].split('.')[3])
+                ip_addresses.append(lq)
         f.close()
+        ip_addresses.sort()
+        lq = ip_addresses.pop()
+        next_ip = self.ip_pool+repr(lq+1)
+        return next_ip
+        
+        
+
+
+if __name__=='__main__':
+    j = Junxon()
+#     j.gen_dhcpd_conf("192.168.1.9","aa:bb:cc:dd:ee:ee")
+    print j.next_ip_address()
+
+    
     
 
         

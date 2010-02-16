@@ -9,7 +9,7 @@ import Pyro.naming, Pyro.core
 
 def register(request):
     # Initialize Pyro parts
-    group = ':junxon-service'
+    group = ':Junxon.Server'
 
     # initialize the client and set the default namespace group
     Pyro.core.initClient()
@@ -32,7 +32,6 @@ def register(request):
         if (rem_ipaddress is not None):
             ip = rem_ipaddress
             mac = j.get_mac_address(ip)
-            print mac
         else:
             ip = "127.0.0.1"
         subscriber = Subscriber(ipaddress=ip, macaddress=mac)
