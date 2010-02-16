@@ -43,8 +43,10 @@ try:
         ns.unregister(':junxon-service.Junxon')
         ns.createGroup(":junxon-service")
 except NamingError:
-    pass
+        pass
+
 uri=daemon.connect(Junxond(),":junxon-service.Junxon")
 
-print "Starting junxond...",
+print "junxond... ready",
 daemon.requestLoop()
+
