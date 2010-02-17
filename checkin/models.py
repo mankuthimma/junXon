@@ -1,5 +1,6 @@
 from django.db import models
 from django.forms import ModelForm
+from django.contrib.auth.models import User
 
 TYPES = (
     ('SYSTEMS', 'Systems'), 
@@ -16,10 +17,11 @@ class Subscriber(models.Model):
     accesskey   = models.CharField(max_length=8, blank=True)
     ipaddress   = models.IPAddressField(blank=True)
     macaddress  = models.CharField(max_length=18, blank=True)
-    recommended = models.CharField(max_length=50, blank=True)    
-    approved    = models.CharField(max_length=50, blank=True) 
+    # Faced issues while using the ForeignKey with reco, approved
+    recommended = models.CharField(max_length=255, editable=True)
+    approved    = models.CharField(max_length=255, editable=False) 
     active      = models.BooleanField(default=False)
-    requested   = models.DateTimeField(auto_now=True, editable=True)
+    requested   = models.DateTimeField(auto_now=True, editable=False)
     starts      = models.DateTimeField(blank=True, null=True)
     expires     = models.DateTimeField(blank=True, null=True)
     
@@ -27,9 +29,6 @@ class Subscriber(models.Model):
     def __unicode__(self):
         return self.name
     
-        
-
-        
 class SubscriberForm(ModelForm):
     class Meta:
         model = Subscriber

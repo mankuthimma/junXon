@@ -5,30 +5,48 @@
 ## $Id$
 ## 
 ## Copyright (C) 2010 INFORMEDIA
-## This program is free software; you can redistribute it and/or modify
-## it under the terms of the GNU General Public License as published by
-## the Free Software Foundation; either version 2 of the License, or
-## (at your option) any later version.
-## 
-## This program is distributed in the hope that it will be useful,
-## but WITHOUT ANY WARRANTY; without even the implied warranty of
-## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-## GNU General Public License for more details.
-## 
-## You should have received a copy of the GNU General Public License
-## along with this program; if not, write to the Free Software
-## Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
-##
 
 from junxon.checkin.models import Subscriber
 from django.contrib import admin
+from netfilter.rule import Rule,Match
+from netfilter.table import Table
+
+import Pyro.naming, Pyro.core
 
 class SubscriberAdmin(admin.ModelAdmin):
-    list_display = ('name','email','mobile')
+    list_display = ('name','email','mobile','active', 'expires')
     ordering = ['name']
     list_per_page = 50
     search_fields = ['name','email']
-#     fields = ('accesskey', 'ipaddress')
+    #     fields = ('accesskey', 'ipaddress')
+
+    def save_model(self, request, obj, form, change):
+        # Initialize Pyro parts
+        group = ':Junxon.Server'
+        
+        # initialize the client and set the default namespace group
+        Pyro.core.initClient()
+        Pyro.config.PYRO_NS_DEFAULTGROUP=group
+
+        # locate the NS
+        locator = Pyro.naming.NameServerLocator()
+        ns = locator.getNS()
+
+        j = Pyro.core.getProxyForURI("PYRONAME://"+group)
+        # j is our object proxy for junxonlib
+        
+        # If enabled, then check if already in DHCP
+        if (obj.active == True):
+            # If not in DHCP, get next IP address
+            if ((obj.macaddress is not None) and (j.is_mac_dhcped(obj.macaddress))):
+                pass
+            elif ((obj.macaddress is not None) and (obj.ipaddress is not None)):
+                # Add IP/Mac to DHCP                
+                j.gen_dhcpd_conf(obj.ipaddress, obj.macaddress)
+                
+        obj.approved = request.user
+        obj.save()
+        
 
 
 admin.site.register(Subscriber, SubscriberAdmin)

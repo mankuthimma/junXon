@@ -19,7 +19,7 @@ def register(request):
     locator = Pyro.naming.NameServerLocator()
     ns = locator.getNS()
 
-    j = Pyro.core.getProxyForURI("PYRONAME://:junxon-service.Junxon")
+    j = Pyro.core.getProxyForURI("PYRONAME://"+group)
     # j is our object proxy for junxonlib
 
     strings = 'abcdefghijklmnopqrstuvwxyz0123456789'
