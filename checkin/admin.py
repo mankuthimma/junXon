@@ -8,7 +8,7 @@
 
 from junxon.checkin.models import Subscriber
 from django.contrib import admin
-from netfilter.rule import Rule,Match
+from netfilter.rule import Rule, Match
 from netfilter.table import Table
 
 import Pyro.naming, Pyro.core
@@ -42,6 +42,20 @@ class SubscriberAdmin(admin.ModelAdmin):
             elif ((obj.macaddress is not None) and (obj.ipaddress is not None)):
                 # Add IP/Mac to DHCP                
                 j.gen_dhcpd_conf(obj.ipaddress, obj.macaddress)
+                # Add a Masquerade rule to the set
+                rule_masquerade = Rule(
+                    source = obj.ipaddress,
+                    jump = 'MASQUERADE')
+                
+                rule_restrict = Rule(
+                    source = obj.ipaddress,
+                    matches = [Match('mac', '--mac-source '+obj.macaddress)],
+                    jump = 'ACCEPT')
+
+                table = Table('nat')
+                table.prepend_rule('POSTROUTING', rule_masquerade)
+                table.prepend_rule('PREROUTING', rule_restrict) 
+                
                 
         obj.approved = request.user
         obj.save()

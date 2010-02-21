@@ -7,7 +7,7 @@
 ## 
 ## Copyright (C) 2010 INFORMEDIA TECHNOLOGIES (MYSORE) PRIVATE LIMITED
 
-import daemon
+import daemon, sys
 
 # Pyro Server for libJunxon
 from Pyro.errors import NamingError
@@ -24,7 +24,7 @@ class Junxond(Pyro.core.ObjBase, Junxon):
                 Pyro.core.ObjBase.__init__(self)
                 Junxon.__init__(self)
                 
-
+# TODO: Load netfilter NAT rules for currently active subscriptions
 
 def main():
 	Pyro.core.initServer()
@@ -32,7 +32,6 @@ def main():
 	ns = Pyro.naming.NameServerLocator().getNS()
 	daemon.useNameServer(ns)
 
-	# make sure our namespace group exists, and that our object name doesn't
 	try:
 		ns.createGroup(JUNXON_GROUP)
 	except NamingError:
@@ -44,11 +43,11 @@ def main():
 
 	uri=daemon.connect(Junxond(),JUNXON_NAME)
 
-	# enter the service loop.
-	print 'Junxon Ready...'
+	sys.stdout.write('Junxon Ready...')
 	daemon.requestLoop()
 
 
+# TODO: Move log file location to configuration
 jxd = daemon.Daemon(
                 stdin="/dev/null",
                 stdout="/tmp/junxon.log",
