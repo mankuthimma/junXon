@@ -37,7 +37,6 @@ class SubscriberAdmin(admin.ModelAdmin):
         
         # If enabled, then check if already in DHCP
         if (obj.active == True):
-            # If not in DHCP, get next IP address
             if ((obj.macaddress is not None) and (j.is_mac_dhcped(obj.macaddress))):
                 pass
             elif ((obj.macaddress is not None) and (obj.ipaddress is not None)):

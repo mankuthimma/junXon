@@ -39,6 +39,6 @@ def register(request):
         form.save(commit=False)
         subscriber.accesskey = ''.join([choice(strings) for i in range(8)])
         subscriber.save()
-        return render_to_response('checkin/acknowledgement.html', {'subscriber': subscriber})
+        return render_to_response('checkin/acknowledgement.html', {'subscriber': subscriber, 'ip': ip, 'mac': mac})
     
 

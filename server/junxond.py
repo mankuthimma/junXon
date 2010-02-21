@@ -1,12 +1,13 @@
-#!/usr/bin/python
+#!/usr/bin/env python
 ##
 ## junxond.py
 ## Author : <shashi@inf.in>
 ## Started on  Mon Feb 15 13:27:24 2010 Shashishekhar S
 ## $Id$
 ## 
-## Copyright (C) 2010 INFORMEDIA
+## Copyright (C) 2010 INFORMEDIA TECHNOLOGIES (MYSORE) PRIVATE LIMITED
 
+import daemon
 
 # Pyro Server for libJunxon
 from Pyro.errors import NamingError
@@ -48,5 +49,16 @@ def main():
 	daemon.requestLoop()
 
 
+jxd = daemon.Daemon(
+                stdin="/dev/null",
+                stdout="/tmp/junxon.log",
+                stderr="/tmp/junxon.log",
+                pidfile="/var/run/junxon.pid",
+                user="root"
+                )
+
+
 if __name__=='__main__':
-	main()
+
+        if jxd.service():
+                main()

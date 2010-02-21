@@ -1,0 +1,47 @@
+K 25
+svn:wc:ra_dav:version-url
+V 57
+/opensource/!svn/ver/333/python-netfilter/trunk/netfilter
+END
+parser.py
+K 25
+svn:wc:ra_dav:version-url
+V 67
+/opensource/!svn/ver/332/python-netfilter/trunk/netfilter/parser.py
+END
+__init__.py
+K 25
+svn:wc:ra_dav:version-url
+V 69
+/opensource/!svn/ver/333/python-netfilter/trunk/netfilter/__init__.py
+END
+test.py
+K 25
+svn:wc:ra_dav:version-url
+V 65
+/opensource/!svn/ver/332/python-netfilter/trunk/netfilter/test.py
+END
+testroot.py
+K 25
+svn:wc:ra_dav:version-url
+V 69
+/opensource/!svn/ver/332/python-netfilter/trunk/netfilter/testroot.py
+END
+firewall.py
+K 25
+svn:wc:ra_dav:version-url
+V 69
+/opensource/!svn/ver/332/python-netfilter/trunk/netfilter/firewall.py
+END
+rule.py
+K 25
+svn:wc:ra_dav:version-url
+V 65
+/opensource/!svn/ver/332/python-netfilter/trunk/netfilter/rule.py
+END
+table.py
+K 25
+svn:wc:ra_dav:version-url
+V 66
+/opensource/!svn/ver/332/python-netfilter/trunk/netfilter/table.py
+END

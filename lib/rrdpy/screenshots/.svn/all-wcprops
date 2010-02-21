@@ -1,0 +1,17 @@
+K 25
+svn:wc:ra_dav:version-url
+V 33
+/svn/!svn/ver/7/trunk/screenshots
+END
+test.rrd.http.png
+K 25
+svn:wc:ra_dav:version-url
+V 51
+/svn/!svn/ver/7/trunk/screenshots/test.rrd.http.png
+END
+test.rrd.rand.png
+K 25
+svn:wc:ra_dav:version-url
+V 51
+/svn/!svn/ver/7/trunk/screenshots/test.rrd.rand.png
+END

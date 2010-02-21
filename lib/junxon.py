@@ -151,20 +151,34 @@ class Junxon:
         next_ip = self.ip_pool+repr(lq+1)
         return next_ip
 
-    def nat_connection(self, ipaddress, macaddress):
+    def add_subscription(self, ipaddress, macaddress):
         rule = Rule(
             in_interface='eth1',
             protocol='tcp',
-            matches=[Match('tcp', '--dport 80'), Match('mac','--mac-source '+macaddress)],
+            matches=[Match('mac','--mac-source '+macaddress)],
             source=ipaddress,
             jump='ACCEPT')
 
         table = Table('filter')
-        return table.prepend_rule('FORWARD', rule)
+        table.prepend_rule('FORWARD', rule)
+        return True
+
+    def remove_subscription(self, ipaddress, macaddress):
+        rule = Rule(
+            in_interface='eth1',
+            protocol='tcp',
+            matches=[Match('mac','--mac-source '+macaddress)],
+            source=ipaddress,
+            jump='ACCEPT')
+
+        table = Table('filter')
+        table.delete_rule('FORWARD', rule)
+        return True
+    
 
 if __name__=='__main__':
     j = Junxon()
-    print j.nat_connection("192.168.1.9","aa:bb:cc:dd:ee:ee")
+#     print j.remove_subscription("192.168.1.9","aa:bb:cc:dd:ee:ee")
 #     j.gen_dhcpd_conf("192.168.1.9","aa:bb:cc:dd:ee:ee")
 #     print j.next_ip_address()
 

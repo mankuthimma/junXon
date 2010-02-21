@@ -1,4 +1,12 @@
-# Django settings for junxon project.
+##
+## settings.py
+## junXon - Wireless Gateway
+## Author : <shashi@inf.in>
+## $Id$
+## 
+## Copyright (C) 2010 INFORMEDIA TECHNOLOGIES (MYSORE) PRIVATE LIMITED
+##
+
 
 DEBUG = True
 TEMPLATE_DEBUG = DEBUG
@@ -73,7 +81,6 @@ INSTALLED_APPS = (
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
-#     'django.contrib.sites',
     'django.contrib.admin',
     'junxon.checkin',
     'junxon.warehouse',   
