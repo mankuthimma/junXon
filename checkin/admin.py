@@ -43,6 +43,7 @@ class SubscriberAdmin(admin.ModelAdmin):
                 # Add IP/Mac to DHCP                
                 j.gen_dhcpd_conf(obj.ipaddress, obj.macaddress)
                 # Add a Masquerade rule to the set
+                # TODO: move function to junxonlib                
                 rule_masquerade = Rule(
                     source = obj.ipaddress,
                     jump = 'MASQUERADE')
@@ -55,7 +56,26 @@ class SubscriberAdmin(admin.ModelAdmin):
                 table = Table('nat')
                 table.prepend_rule('POSTROUTING', rule_masquerade)
                 table.prepend_rule('PREROUTING', rule_restrict) 
+
+        if (obj.active == False):
+            if ((obj.macaddress is not None) and (j.is_mac_dhcped(obj.macaddress))):
+                j.remove_dhcp_record_by_mac(obj.macaddress)
+                # Add a Masquerade rule to the set
+                # TODO: move function to junxonlib
+                rule_masquerade = Rule(
+                    source = obj.ipaddress,
+                    jump = 'MASQUERADE')
                 
+                rule_restrict = Rule(
+                    source = obj.ipaddress,
+                    matches = [Match('mac', '--mac-source '+obj.macaddress)],
+                    jump = 'ACCEPT')
+
+                table = Table('nat')
+                table.delete_rule('POSTROUTING', rule_masquerade)
+                table.delete_rule('PREROUTING', rule_restrict) 
+
+            
                 
         obj.approved = request.user
         obj.save()

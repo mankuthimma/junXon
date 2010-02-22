@@ -42,7 +42,7 @@ class Junxon:
         self.ip_pool = "192.168.1."
 
     def get_mac_address(self, ip):
-        ans,unans = srp(Ether(dst="ff:ff:ff:ff:ff:ff")/ARP(pdst=ip),timeout=3,iface="eth1")
+        ans,unans = srp(Ether(dst="ff:ff:ff:ff:ff:ff")/ARP(pdst=ip),timeout=3,iface="eth0")
         macaddress = ""
         for s,r in ans:
             macaddress = r.sprintf("%Ether.src%")
