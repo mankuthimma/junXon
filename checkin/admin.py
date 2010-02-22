@@ -18,7 +18,6 @@ class SubscriberAdmin(admin.ModelAdmin):
     ordering = ['name']
     list_per_page = 50
     search_fields = ['name','email']
-    #     fields = ('accesskey', 'ipaddress')
 
     def save_model(self, request, obj, form, change):
         # Initialize Pyro parts
@@ -42,38 +41,12 @@ class SubscriberAdmin(admin.ModelAdmin):
             elif ((obj.macaddress is not None) and (obj.ipaddress is not None)):
                 # Add IP/Mac to DHCP                
                 j.gen_dhcpd_conf(obj.ipaddress, obj.macaddress)
-                # Add a Masquerade rule to the set
-                # TODO: move function to junxonlib                
-                rule_masquerade = Rule(
-                    source = obj.ipaddress,
-                    jump = 'MASQUERADE')
-                
-                rule_restrict = Rule(
-                    source = obj.ipaddress,
-                    matches = [Match('mac', '--mac-source '+obj.macaddress)],
-                    jump = 'ACCEPT')
-
-                table = Table('nat')
-                table.prepend_rule('POSTROUTING', rule_masquerade)
-                table.prepend_rule('PREROUTING', rule_restrict) 
+                j.enable_subscription(obj.ipaddress, obj.macaddress)
 
         if (obj.active == False):
             if ((obj.macaddress is not None) and (j.is_mac_dhcped(obj.macaddress))):
                 j.remove_dhcp_record_by_mac(obj.macaddress)
-                # Add a Masquerade rule to the set
-                # TODO: move function to junxonlib
-                rule_masquerade = Rule(
-                    source = obj.ipaddress,
-                    jump = 'MASQUERADE')
-                
-                rule_restrict = Rule(
-                    source = obj.ipaddress,
-                    matches = [Match('mac', '--mac-source '+obj.macaddress)],
-                    jump = 'ACCEPT')
-
-                table = Table('nat')
-                table.delete_rule('POSTROUTING', rule_masquerade)
-                table.delete_rule('PREROUTING', rule_restrict) 
+                j.disable_subscription(obj.ipaddress, obj.macaddress)
 
             
                 

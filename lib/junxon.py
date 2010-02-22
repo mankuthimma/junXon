@@ -25,7 +25,7 @@ from scapy import srp, ARP, Ether, conf
 from subprocess import call
 
 from netfilter.rule import Rule,Match
-from netfilter.table import Table
+from netfilter.table import Table, IptablesError
 
 conf.verb = 0                           # Turn off verbose reporting by Scapy
 
@@ -151,28 +151,43 @@ class Junxon:
         next_ip = self.ip_pool+repr(lq+1)
         return next_ip
 
-    def add_subscription(self, ipaddress, macaddress):
-        rule = Rule(
-            in_interface='eth1',
-            protocol='tcp',
-            matches=[Match('mac','--mac-source '+macaddress)],
-            source=ipaddress,
-            jump='ACCEPT')
+    def enable_subscription(self, ipaddress, macaddress):
+        rule_masquerade = Rule(
+            source = ipaddress,
+            jump = 'MASQUERADE')
+
+        rule_restrict = Rule(
+            source = ipaddress,
+            matches = [Match('mac', '--mac-source '+macaddress)],
+            jump = 'ACCEPT')
+
+        table = Table('nat')
+        table.prepend_rule('POSTROUTING', rule_masquerade)
+        table.prepend_rule('PREROUTING', rule_restrict) 
 
         table = Table('filter')
         table.prepend_rule('FORWARD', rule)
         return True
 
-    def remove_subscription(self, ipaddress, macaddress):
-        rule = Rule(
-            in_interface='eth1',
-            protocol='tcp',
-            matches=[Match('mac','--mac-source '+macaddress)],
-            source=ipaddress,
-            jump='ACCEPT')
+    def disable_subscription(self, ipaddress, macaddress):
+        rule_masquerade = Rule(
+            source = ipaddress,
+            jump = 'MASQUERADE')
 
-        table = Table('filter')
-        table.delete_rule('FORWARD', rule)
+        rule_restrict = Rule(
+            source = ipaddress,
+            matches = [Match('mac', '--mac-source '+macaddress)],
+            jump = 'ACCEPT')
+
+        table = Table('nat')
+        try:
+            table.delete_rule('POSTROUTING', rule_masquerade)
+            table.delete_rule('PREROUTING', rule_restrict)
+        except IptablesError, e:
+            sys.stdout.write("Ignoring non-existant rule: "+e)
+        except Error, e:
+            sys.stdout.write("Error: "+e)            
+            
         return True
     
 
