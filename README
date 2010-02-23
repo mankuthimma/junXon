@@ -19,3 +19,4 @@ External Dependencies
 1. iptables
 2. rrdtool
 3. ISC DHCPd
+4. Bind

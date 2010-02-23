@@ -23,12 +23,10 @@ class Junxond(Pyro.core.ObjBase, Junxon):
         def __init__(self):
                 Pyro.core.ObjBase.__init__(self)
                 Junxon.__init__(self)
-                
-# TODO: Load netfilter NAT rules for currently active subscriptions
 
 def main():
 
-
+        # Load currently active subscriptions
         jx = Junxon()
         jx.init_active()
 

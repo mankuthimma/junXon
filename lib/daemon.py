@@ -201,7 +201,11 @@ class Daemon(object):
 			pid = int(data)
 		except ValueError:
 			sys.stderr.write("pidfile looks mangled %s: %r\n" % (self.options.pidfile, data))
-		os.kill(pid, signal.SIGTERM)
+
+                try:
+                        os.kill(pid, signal.SIGTERM)
+                except OSError:
+                        sys.stderr.write("Ignoring missing PID\n")
 
 	def optionparser(self):
 		"""

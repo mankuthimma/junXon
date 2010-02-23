@@ -16,7 +16,7 @@ from netfilter.table import Table, IptablesError
 
 from atset import AtSet
 
-from checkin.models import Subscriber
+from junxon.checkin.models import Subscriber
 
 conf.verb = 0                           # Turn off verbose reporting by Scapy
 
@@ -191,6 +191,10 @@ class Junxon:
     def init_active(self):
         allsubs = Subscriber.objects.all()
         for eachsub in allsubs:
+            # Ignore disabled
+            if (eachsub.active == False):
+                continue
+            
             cur_time = datetime.datetime.today()
             if ((cur_time >= eachsub.starts) and (cur_time < eachsub.expires)):
                 self.disable_subscription(eachsub.ipaddress, eachsub.macaddress)
@@ -206,7 +210,7 @@ class Junxon:
 if __name__=='__main__':
     
     j = Junxon()
-    j.init_active()
+#     j.init_active()
 #     print j.remove_subscription("192.168.1.9","aa:bb:cc:dd:ee:ee")
 #     j.gen_dhcpd_conf("192.168.1.9","aa:bb:cc:dd:ee:ee")
 #     print j.next_ip_address()

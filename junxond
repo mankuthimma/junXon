@@ -1,0 +1,33 @@
+#!/bin/sh
+##
+## junxond
+## Author : <shashi@inf.in>
+## Started on  Mon Feb 22 13:06:09 2010 Shashishekhar S
+## $Id$
+## 
+## Copyright (C) 2010 INFORMEDIA TECHNOLOGIES (MYSORE) PRIVATE LIMITED
+##
+
+# Set environment
+export PYTHONPATH=/opt:/opt/junxon:/opt/junxon/lib:/opt/junxon/xroad
+
+# Restart Pyro NS - TODO 
+/etc/init.d/pyro-nsd restart
+
+# Start junxond.py
+/opt/junxon/server/junxond.py restart
+
+# Setup Netfilter Rules
+
+# Flush All
+/sbin/iptables -t filter --flush
+/sbin/iptables -t nat --flush
+/sbin/iptables -t mangle --flush
+
+# Init Rules
+/sbin/iptables -t nat -I PREROUTING -p tcp --dport 80 -j DNAT --to 192.168.1.200 # Redirect all incoming packets
+
+# Enable packet forwarding
+echo 1 > /proc/sys/net/ipv4/ip_forward
+
+
