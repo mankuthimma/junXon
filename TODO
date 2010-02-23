@@ -1,0 +1,6 @@
+1. In junxond, initialize hosts from the database - add them to NAT table.
+2. Integrate XRoad with  junxond
+3. Write installer
+4. Design proper templates
+5. Test with various modes
+6. Visited websites monitor

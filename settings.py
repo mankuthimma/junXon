@@ -83,5 +83,4 @@ INSTALLED_APPS = (
     'django.contrib.sessions',
     'django.contrib.admin',
     'junxon.checkin',
-    'junxon.warehouse',   
 )

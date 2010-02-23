@@ -7,7 +7,7 @@
 ## Copyright (C) 2010 INFORMEDIA TECHNOLOGIES (MYSORE) PRIVATE LIMITED
 ##
 
-import re, sys
+import re, sys, time, datetime
 from scapy import srp, ARP, Ether, conf
 from subprocess import call
 
@@ -15,6 +15,8 @@ from netfilter.rule import Rule,Match
 from netfilter.table import Table, IptablesError
 
 from atset import AtSet
+
+from checkin.models import Subscriber
 
 conf.verb = 0                           # Turn off verbose reporting by Scapy
 
@@ -138,7 +140,7 @@ class Junxon:
         next_ip = self.ip_pool+repr(lq+1)
         return next_ip
 
-    def enable_subscription(self, ipaddress, macaddress):
+    def enable_subscription(self, ipaddress, macaddress, expiry=None):
         rule_masquerade = Rule(
             source = ipaddress,
             jump = 'MASQUERADE')
@@ -151,7 +153,13 @@ class Junxon:
         table = Table('nat')
         table.prepend_rule('POSTROUTING', rule_masquerade)
         table.prepend_rule('PREROUTING', rule_restrict)
-        sys.stdout.write("Enabling "+ipaddress+", Mac "+macaddress) 
+        table.commit()
+        sys.stderr.write("Enabling "+ipaddress+", Mac "+macaddress)
+        time.sleep(3)                   # Pause
+
+        if (expiry is not None):
+            self.call_at(expiry, ipaddress, macaddress)
+            
         return True
 
     def disable_subscription(self, ipaddress, macaddress):
@@ -169,19 +177,36 @@ class Junxon:
             table.delete_rule('POSTROUTING', rule_masquerade)
             table.delete_rule('PREROUTING', rule_restrict)
         except IptablesError, e:
-            sys.stdout.write("Ignoring non-existant rule: "+e)
-        except Error, e:
-            sys.stdout.write("Error: "+e)            
+            sys.stdout.write("Ignoring non-existant rule")
+        except Exception, e:
+            sys.stdout.write("Unknown Error: ")            
         sys.stdout.write("Disabling "+ipaddress+", Mac "+macaddress) 
         return True
 
     def call_at(self, when, ipaddress, macaddress):
         a = AtSet()
-        a.at(when, (ipaddress, macaddress))
+        a.at(when, ipaddress, macaddress)
         return True
+
+    def init_active(self):
+        allsubs = Subscriber.objects.all()
+        for eachsub in allsubs:
+            cur_time = datetime.datetime.today()
+            if ((cur_time >= eachsub.starts) and (cur_time < eachsub.expires)):
+                self.disable_subscription(eachsub.ipaddress, eachsub.macaddress)
+                self.enable_subscription(eachsub.ipaddress, eachsub.macaddress, eachsub.expires.strftime('%I:%M%p %b %d'))
+            else:
+                eachsub.active=False
+                eachsub.save()
+
+
+        
+        
     
 if __name__=='__main__':
+    
     j = Junxon()
+    j.init_active()
 #     print j.remove_subscription("192.168.1.9","aa:bb:cc:dd:ee:ee")
 #     j.gen_dhcpd_conf("192.168.1.9","aa:bb:cc:dd:ee:ee")
 #     print j.next_ip_address()

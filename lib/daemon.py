@@ -194,12 +194,13 @@ class Daemon(object):
 		try:
 			pidfile = open(self.options.pidfile, "rb")
 		except IOError, exc:
-			sys.exit("can't open pidfile %s: %s" % (self.options.pidfile, str(exc)))
+			sys.stderr.write("Ignoring missing pidfile %s: %s\n" % (self.options.pidfile, str(exc)))
+                        return -1
 		data = pidfile.read()
 		try:
 			pid = int(data)
 		except ValueError:
-			sys.exit("mangled pidfile %s: %r" % (self.options.pidfile, data))
+			sys.stderr.write("pidfile looks mangled %s: %r\n" % (self.options.pidfile, data))
 		os.kill(pid, signal.SIGTERM)
 
 	def optionparser(self):

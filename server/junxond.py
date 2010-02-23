@@ -13,7 +13,7 @@ import daemon, sys
 from Pyro.errors import NamingError
 import Pyro.core, Pyro.naming, Pyro.util
 
-from junxon import Junxon
+from libjunxon import Junxon
 
 JUNXON_GROUP = ":Junxon"
 JUNXON_NAME = JUNXON_GROUP+".Server"
@@ -27,6 +27,12 @@ class Junxond(Pyro.core.ObjBase, Junxon):
 # TODO: Load netfilter NAT rules for currently active subscriptions
 
 def main():
+
+
+        jx = Junxon()
+        jx.init_active()
+
+        # Daemonize PyroJunxon
 	Pyro.core.initServer()
 	daemon = Pyro.core.Daemon()
 	ns = Pyro.naming.NameServerLocator().getNS()

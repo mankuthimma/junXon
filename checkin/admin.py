@@ -15,9 +15,9 @@ import Pyro.naming, Pyro.core
 
 class SubscriberAdmin(admin.ModelAdmin):
     list_display = ('name','email','mobile','active', 'expires')
-    ordering = ['name']
+    ordering = ['-requested']
     list_per_page = 50
-    search_fields = ['name','email']
+    search_fields = ['name','email','mobile']
 
     def save_model(self, request, obj, form, change):
         # Initialize Pyro parts
@@ -39,18 +39,16 @@ class SubscriberAdmin(admin.ModelAdmin):
             if ((obj.macaddress is not None) and (j.is_mac_dhcped(obj.macaddress))):
                 pass
             elif ((obj.macaddress is not None) and (obj.ipaddress is not None)):
+                expiry = obj.expires.strftime('%I:%M%p %b %d')
                 # Add IP/Mac to DHCP                
                 j.gen_dhcpd_conf(obj.ipaddress, obj.macaddress)
-                j.enable_subscription(obj.ipaddress, obj.macaddress)
-                j.call_at(obj.expires.strftime('%Y-%m-%d %H:%M'), obj.ipaddress, obj.macaddress)
+                j.enable_subscription(obj.ipaddress, obj.macaddress, expiry)
 
         if (obj.active == False):
             if ((obj.macaddress is not None) and (j.is_mac_dhcped(obj.macaddress))):
                 j.remove_dhcp_record_by_mac(obj.macaddress)
                 j.disable_subscription(obj.ipaddress, obj.macaddress)
 
-            
-                
         obj.approved = request.user
         obj.save()
         
