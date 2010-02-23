@@ -4,20 +4,7 @@
 ## Started on  Mon Feb 15 13:10:21 2010 Shashishekhar S
 ## $Id$
 ## 
-## Copyright (C) 2010 INFORMEDIA
-## This program is free software; you can redistribute it and/or modify
-## it under the terms of the GNU General Public License as published by
-## the Free Software Foundation; either version 2 of the License, or
-## (at your option) any later version.
-## 
-## This program is distributed in the hope that it will be useful,
-## but WITHOUT ANY WARRANTY; without even the implied warranty of
-## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-## GNU General Public License for more details.
-## 
-## You should have received a copy of the GNU General Public License
-## along with this program; if not, write to the Free Software
-## Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+## Copyright (C) 2010 INFORMEDIA TECHNOLOGIES (MYSORE) PRIVATE LIMITED
 ##
 
 import re, sys
@@ -27,9 +14,9 @@ from subprocess import call
 from netfilter.rule import Rule,Match
 from netfilter.table import Table, IptablesError
 
+from atset import AtSet
+
 conf.verb = 0                           # Turn off verbose reporting by Scapy
-
-
 
 class Junxon:
     """ The Junxon helper library. Provides a set of utilities to manage connection requests
@@ -163,10 +150,8 @@ class Junxon:
 
         table = Table('nat')
         table.prepend_rule('POSTROUTING', rule_masquerade)
-        table.prepend_rule('PREROUTING', rule_restrict) 
-
-        table = Table('filter')
-        table.prepend_rule('FORWARD', rule)
+        table.prepend_rule('PREROUTING', rule_restrict)
+        sys.stdout.write("Enabling "+ipaddress+", Mac "+macaddress) 
         return True
 
     def disable_subscription(self, ipaddress, macaddress):
@@ -187,10 +172,14 @@ class Junxon:
             sys.stdout.write("Ignoring non-existant rule: "+e)
         except Error, e:
             sys.stdout.write("Error: "+e)            
-            
+        sys.stdout.write("Disabling "+ipaddress+", Mac "+macaddress) 
+        return True
+
+    def call_at(self, when, ipaddress, macaddress):
+        a = AtSet()
+        a.at(when, (ipaddress, macaddress))
         return True
     
-
 if __name__=='__main__':
     j = Junxon()
 #     print j.remove_subscription("192.168.1.9","aa:bb:cc:dd:ee:ee")

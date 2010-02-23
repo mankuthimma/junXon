@@ -8,7 +8,6 @@
 ## Copyright (C) 2010 INFORMEDIA TECHNOLOGIES (MYSORE) PRIVATE LIMITED
 
 import daemon, sys
-from junxon.checkin.models import Subscriber
 
 # Pyro Server for libJunxon
 from Pyro.errors import NamingError

@@ -42,6 +42,7 @@ class SubscriberAdmin(admin.ModelAdmin):
                 # Add IP/Mac to DHCP                
                 j.gen_dhcpd_conf(obj.ipaddress, obj.macaddress)
                 j.enable_subscription(obj.ipaddress, obj.macaddress)
+                j.call_at(obj.expires.strftime('%Y-%m-%d %H:%M'), obj.ipaddress, obj.macaddress)
 
         if (obj.active == False):
             if ((obj.macaddress is not None) and (j.is_mac_dhcped(obj.macaddress))):
