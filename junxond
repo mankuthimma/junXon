@@ -10,6 +10,7 @@
 
 # Set environment
 export PYTHONPATH=/opt:/opt/junxon:/opt/junxon/lib:/opt/junxon/xroad
+export DJANGO_SETTINGS_MODULE=settings
 
 # Restart Pyro NS - TODO 
 /etc/init.d/pyro-nsd restart

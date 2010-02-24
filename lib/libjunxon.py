@@ -15,6 +15,7 @@ from netfilter.rule import Rule,Match
 from netfilter.table import Table, IptablesError
 
 from atset import AtSet
+from libxroad import XRoad
 
 from junxon.checkin.models import Subscriber
 
@@ -31,6 +32,7 @@ class Junxon:
         self.ip_pool = "192.168.1."
 
     def get_mac_address(self, ip):
+        # TODO: interface should be configured in settings
         ans,unans = srp(Ether(dst="ff:ff:ff:ff:ff:ff")/ARP(pdst=ip),timeout=3,iface="eth0")
         macaddress = ""
         for s,r in ans:
@@ -202,14 +204,20 @@ class Junxon:
             else:
                 eachsub.active=False
                 eachsub.save()
+        
 
+    def xr_addhost(self, macaddress, hostname, ipaddress):
 
+        xrd = XRoad()
+        xrd.addhost(macaddress, hostname, ipaddress)
+        return True
         
         
     
 if __name__=='__main__':
     
     j = Junxon()
+#     j.xr_addhost("aa:bb:cc:dd:ee:ff", "16_pradeep_m", "192.168.1.17")
 #     j.init_active()
 #     print j.remove_subscription("192.168.1.9","aa:bb:cc:dd:ee:ee")
 #     j.gen_dhcpd_conf("192.168.1.9","aa:bb:cc:dd:ee:ee")

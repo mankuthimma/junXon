@@ -23,7 +23,8 @@
 ##
 
 
-import settings, sys
+import sys
+from xroad import settings
 
 sys.path.append(settings.xroadpath)
 sys.path.append(settings.rrdlib)
@@ -31,7 +32,7 @@ sys.path.append(settings.rrdlib)
 import rrd
 
 from optparse import OptionParser
-from xroad import XRoad
+from libxroad import XRoad
 
 class XRoadTool:
 

@@ -29,7 +29,7 @@ import daemon
 sys.path.append(settings.xroadpath)
 sys.path.append(settings.rrdlib)
 
-from xroad import XRoad
+from libxroad import XRoad
 
 class XRoadD:
     

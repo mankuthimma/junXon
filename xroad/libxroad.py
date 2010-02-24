@@ -21,7 +21,8 @@
 ## Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 ##
 
-import settings, sys
+from xroad import settings
+import sys, os.path
 import sqlite
 
 sys.path.append(settings.xroadpath)
@@ -79,8 +80,9 @@ class XRoad:
     def createrrd(self, macaddress):
         mac_norm = macaddress.replace(":","")
         rrd_file = settings.rrdroot + mac_norm + ".rrd"
-        r = rrd.RRD(rrd_file, vertical_label='value')
-        r.create_rrd(settings.rrdinterval)
+        if (not os.path.exists(rrd_file)):
+            r = rrd.RRD(rrd_file, vertical_label='value')
+            r.create_rrd(settings.rrdinterval)
         return True
 
     def remhost(self, macaddress=None):
@@ -169,8 +171,7 @@ class XRoad:
             id = h[0]
             macaddress = h[2]
             self.markhost(id, macaddress)
-            
-        
+
 if __name__ == "__main__":
     x = XRoad()
     #     x.initdb()

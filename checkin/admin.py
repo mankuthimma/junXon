@@ -12,6 +12,7 @@ from netfilter.rule import Rule, Match
 from netfilter.table import Table
 
 import Pyro.naming, Pyro.core
+import re
 
 class SubscriberAdmin(admin.ModelAdmin):
     list_display = ('name','email','mobile','active', 'expires')
@@ -43,6 +44,11 @@ class SubscriberAdmin(admin.ModelAdmin):
                 # Add IP/Mac to DHCP                
                 j.gen_dhcpd_conf(obj.ipaddress, obj.macaddress)
                 j.enable_subscription(obj.ipaddress, obj.macaddress, expiry)
+                # Add subscription to monitoring
+                pre = re.compile('(\W+)')
+                _hostname = pre.sub('_', obj.name.lower())
+                _hostname = str(obj.id) + '_' + _hostname
+                j.xr_addhost(obj.macaddress, _hostname, obj.ipaddress)
 
         if (obj.active == False):
             if ((obj.macaddress is not None) and (j.is_mac_dhcped(obj.macaddress))):

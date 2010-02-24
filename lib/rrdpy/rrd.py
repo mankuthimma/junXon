@@ -13,6 +13,7 @@
 
 import os
 import time
+import sys
 
 
 class RRD(object):
@@ -22,16 +23,19 @@ class RRD(object):
 
 
     def create_rrd(self, interval):  
-        interval = str(interval) 
-        interval_mins = float(interval) / 60  
-        heartbeat = str(int(interval) * 2)
-        ds_string = ' DS:test:GAUGE:%s:U:U' % heartbeat
+        interval                = 300  # 5 minute step (base interval with which data will be fed into the RRD)
+        heartbeat               = 600  # 10 minute heartbeat for each data source
+        ds1                     = ' DS:in:DERIVE:%s:0:12500000' % heartbeat # 2 data sources (in, and out)
+        ds2                     = ' DS:out:DERIVE:%s:0:12500000' % heartbeat
+        rra1                    = ' RRA:AVERAGE:0.5:1:576' # 2 days of 5 minute averages
+        rra2                    = ' RRA:AVERAGE:0.5:6:672' # 2 weeks of 1/2 hour averages
+        rra3                    = ' RRA:AVERAGE:0.5:24:732' # 2 months of 2 hour averages
+        rra4                    = ' RRA:AVERAGE:0.5:144:1460' # 2 years of 12 hour averages
+
         cmd_create = ''.join((
-            'rrdtool create ', self.rrd_name, ' --step ', interval, ds_string,
-            ' RRA:AVERAGE:0.5:1:', str(int(4000 / interval_mins)),
-            ' RRA:AVERAGE:0.5:', str(int(30 / interval_mins)), ':800',
-            ' RRA:AVERAGE:0.5:', str(int(120 / interval_mins)), ':800',
-            ' RRA:AVERAGE:0.5:', str(int(1440 / interval_mins)), ':800',
+            'rrdtool create ', self.rrd_name, ' --step ', str(interval),
+            ds1, ds2,
+            rra1, rra2, rra3, rra4,
             ))
         cmd = os.popen4(cmd_create)
         cmd_output = cmd[1].read()

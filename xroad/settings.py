@@ -31,5 +31,5 @@ rrdlib          = junxonpath + "/lib/rrdpy/"
 rrdroot         = junxonpath + "/cache/flowdata/"
 rrdpng          = junxonpath + "/cache/png/"
 rrdinterval     = 60
-logfile         = junxonpath "/log/xroad.log"
+logfile         = junxonpath+"/log/xroad.log"
 
