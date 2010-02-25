@@ -182,7 +182,7 @@ class XRoad:
             
             # Daily
             opts['graphtype'] = "day"
-            opts['title'] = "Usage " + title
+            opts['title'] = "Usage" + title
             opts['filename'] = pngdir + "daily.png"
             r.graph(opts)
 
