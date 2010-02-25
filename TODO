@@ -4,3 +4,7 @@
 4. Design proper templates
 5. Test with various modes
 6. Visited websites monitor
+
+RRD for junXon Hosts:
+
+1. 10 minutes is too long an interval. Ideally the tracking must happen every minute

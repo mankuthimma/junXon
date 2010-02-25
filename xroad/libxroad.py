@@ -58,19 +58,22 @@ class XRoad:
         except sqlite.Error, e:
             pass
 
-        _sql_ = "CREATE TABLE hosts (id INTEGER PRIMARY KEY, hostname TEXT, macaddress TEXT)"
+        _sql_ = "CREATE TABLE hosts (id INTEGER PRIMARY KEY, hostname TEXT, macaddress TEXT, ipaddress TEXT)"
         c.execute(_sql_)
 
         self.cx.commit()
         return True
         
     
-    def addhost(self, macaddress=None, hostname=None, ipaddress=None):
+    def addhost(self, macaddress=None, hostname=None, ipaddress=None, idnum=None):
         """ Add a host to be monitored """
 
         macaddress = macaddress.upper()
         hostname   = hostname.upper()
-        _sql_ = "INSERT INTO hosts (hostname, macaddress) VALUES ('"+hostname+"','"+macaddress+"')"
+        # Remove if record pertaining to macaddress already exists
+        self.remhost(macaddress)
+
+        _sql_ = "INSERT INTO hosts (id, hostname, macaddress, ipaddress) VALUES (%d, '%s', '%s', '%s')" % (int(idnum), hostname, macaddress, ipaddress)
         c = self.cx.cursor()
         c.execute(_sql_)
         self.cx.commit()
@@ -95,53 +98,114 @@ class XRoad:
         self.cx.commit()
         return True
 
-    def markhost(self, id, macaddress):
-        # rule = Rule(jump=Target('LOG', '--log-prefix "ICMP accepted : " --log-level 4'))
-        target = Target('CONNMARK', '--set-mark '+repr(id))
-        rule = Rule(
-            in_interface=settings.interface,
-            matches = [Match('mac', '--mac-source '+macaddress)],
-            jump = target)
-            
-        table = Table('mangle')
-        table.append_rule('FORWARD', rule)
-        return True
+    def markhost(self, oid, ipaddress):
+        target_out = Target('CONNMARK', '--set-mark '+str(oid))
+        rule_out = Rule(
+            source = ipaddress + "/32",
+            jump = target_out)
 
-    def unmarkhost(self, id, macaddress):
-        target = Target('CONNMARK', '--set-mark '+repr(id))
-        rule = Rule(
-            in_interface=settings.interface,
-            matches = [Match('mac', '--mac-source '+macaddress)],
-            jump = target)
+        target_in = Target('CONNMARK', '--set-mark '+str(oid))
+        rule_in = Rule(
+            destination = ipaddress + "/32",
+            jump = target_out)
             
         table = Table('mangle')
         try:
-            table.delete_rule('FORWARD', rule)
+            table.append_rule('out_traffic', rule_out)
+            table.append_rule('in_traffic', rule_in)
         except IptablesError, e:
-            sys.stdout.write('Rule unavailable' % e)            
+            sys.stdout.write("Unknown error: %s" % e)
+        return True
+
+    def unmarkhost(self, oid, ipaddress):
+        target_out = Target('CONNMARK', '--set-mark '+str(oid))
+        rule_out = Rule(
+            source = ipaddress + "/32",
+            jump = target_out)
+
+        target_in = Target('CONNMARK', '--set-mark '+str(oid))
+        rule_in = Rule(
+            destination = ipaddress + "/32",
+            jump = target_out)
+
+        table = Table('mangle')
+        try:
+            table.delete_rule('out_traffic', rule_out)
+            table.delete_rule('in_traffic', rule_in)        
+        except IptablesError, e:
+            sys.stdout.write('Rule not found: %s' % e)            
         return True        
 
     def updreading(self):
         r = Readings()
-        vals = r.getstats()
-        for m in vals.keys():
-            mac = m.upper().replace(":","")
+        vals_in = r.getstats("in")
+        vals_out = r.getstats("out")
+
+        _sql_ = "SELECT id, hostname, macaddress, ipaddress  FROM hosts ORDER BY id"
+        c = self.cx.cursor()
+        c.execute(_sql_)
+
+        for h in c:
+            mac = h[2].upper().replace(":","")
+            idnum = h[0]
             rrd_file = settings.rrdroot + mac + ".rrd"
             r = rrd.RRD(rrd_file)
-            r.update(vals[m])
-            self.gengraph(mac, mac)
+            r.update(vals_in[idnum], vals_out[idnum])
         return True
 
-    def gengraph(self, macaddress, legend="Host Traffic"):
-        fname = macaddress.upper().replace(":","")
-        rrd_file = settings.rrdroot + fname + ".rrd"
-        png_file = settings.rrdpng + fname + ".png"
-        r = rrd.RRD(rrd_file, vertical_label="Traffic")
-        r.graph(10, png_file, legend)
+    def gengraphs(self):
+        
+        _sql_ = "SELECT id, hostname, macaddress, ipaddress  FROM hosts ORDER BY id"
+        c = self.cx.cursor()
+        c.execute(_sql_)
+        rrdpng = settings.rrdpng
+
+        opts = {}
+        for h in c:
+            mac = h[2].upper().replace(":","")
+            idnum = h[0]
+            rrd_file = settings.rrdroot + mac + ".rrd"
+
+            hostname = h[1]
+            ipaddress = h[3]
+            title = " report for "+hostname+"/"+ipaddress
+            
+            # Common for all below
+            opts['rrdfile'] = rrd_file
+            r = rrd.RRD(rrd_file)
+            
+            pngdir = rrdpng + str(idnum) + "/"
+            if (not os.path.exists(pngdir)):
+                os.mkdir(pngdir)
+            
+            # Daily
+            opts['graphtype'] = "day"
+            opts['title'] = "Usage " + title
+            opts['filename'] = pngdir + "daily.png"
+            r.graph(opts)
+
+            # Weekly
+#             opts['graphtype'] = "week"
+#             opts['title'] = "Weekly" + title            
+#             opts['filename'] = pngdir + "weekly.png"
+#             r.graph(opts)
+            
+#             # Monthly
+#             opts['graphtype'] = "month"
+#             opts['title'] = "Monthly" + title            
+#             opts['filename'] = pngdir + "monthly.png"
+#             r.graph(opts)
+
+#             # Yearly
+#             opts['graphtype'] = "year"
+#             opts['title'] = "Yearly" + title            
+#             opts['filename'] = pngdir + "yearly.png"
+#             r.graph(opts)
+            
         return True
 
     def listhosts(self):
-        _sql_ = "SELECT id, hostname, macaddress  FROM hosts ORDER BY id"
+        _sql_ = "SELECT id, hostname, macaddress, ipaddress  FROM hosts ORDER BY id"
         c = self.cx.cursor()
         c.execute(_sql_)
         hosts = []
@@ -151,32 +215,32 @@ class XRoad:
         return hosts
 
     def flushall(self):
-        _sql_ = "SELECT id, hostname, macaddress  FROM hosts ORDER BY id"
+        _sql_ = "SELECT id, ipaddress  FROM hosts ORDER BY id"
         c = self.cx.cursor()
         c.execute(_sql_)
         hosts = []
         for h in c:
-            # rule = Rule(jump=Target('LOG', '--log-prefix "ICMP accepted : " --log-level 4'))
-            id = h[0]
-            macaddress = h[2]
-            self.unmarkhost(id, macaddress)
+            xid = h[0]
+            ipaddress = h[1]
+            self.unmarkhost(xid, ipaddress)
 
             
     def markall(self):
-        _sql_ = "SELECT id, hostname, macaddress  FROM hosts ORDER BY id"
+        _sql_ = "SELECT id, ipaddress  FROM hosts ORDER BY id"
         c = self.cx.cursor()
         c.execute(_sql_)
         hosts = []
         for h in c:
-            id = h[0]
-            macaddress = h[2]
-            self.markhost(id, macaddress)
+            xid = h[0]
+            ipaddress = h[1]
+            self.markhost(xid, ipaddress)
 
 if __name__ == "__main__":
     x = XRoad()
+    x.gengraphs()
     #     x.initdb()
     #     x.addhost("woodlice","aa:bb:cc:dd:ee:ff")
-    #     x.markhost(3, "aa:bb:cc:dd:ee:ff")
+#     x.markhost(3, "aa:bb:cc:dd:ee:ff")
     #x.updreading()
     #     x.gengraph("aa:bb:cc:dd:ee:ff")
 #     systems = {}

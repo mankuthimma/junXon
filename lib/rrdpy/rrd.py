@@ -23,8 +23,8 @@ class RRD(object):
 
 
     def create_rrd(self, interval):  
-        interval                = 300  # 5 minute step (base interval with which data will be fed into the RRD)
-        heartbeat               = 600  # 10 minute heartbeat for each data source
+        interval                = 60  # 1 minute step (base interval with which data will be fed into the RRD)
+        heartbeat               = 300  # 5 minute heartbeat for each data source
         ds1                     = ' DS:in:DERIVE:%s:0:12500000' % heartbeat # 2 data sources (in, and out)
         ds2                     = ' DS:out:DERIVE:%s:0:12500000' % heartbeat
         rra1                    = ' RRA:AVERAGE:0.5:1:576' # 2 days of 5 minute averages
@@ -46,47 +46,62 @@ class RRD(object):
   
     def update(self, *values):   
         values_args = ''.join([str(value) + ':' for value in values])[:-1]
-        cmd_update = 'rrdtool update %s N:%s' % (self.rrd_name, values_args)
+        cmd_update = 'rrdtool update %s -t in:out N:%s' % (self.rrd_name, values_args)
+        f = open("/tmp/upd.log","a+")
+        f.write(cmd_update)
+        f.close()
         cmd = os.popen4(cmd_update)
         cmd_output = cmd[1].read()
         for fd in cmd: fd.close()
         if len(cmd_output) > 0:
             raise RRDException, 'Unable to update RRD: ' + cmd_output
-    
-    
-    def graph(self, mins, png_name=None, legend=None): 
-        start_time = 'now-%s' % (mins * 60)
-        if (png_name is None):
-            output_filename = self.rrd_name
-        else:
-            output_filename = png_name
+            
+    def graph(self, vals):
+        """
+                Inputs:
+        
+                graphtype       = vals['graphtype'] (day, week, month, year)
+                filename        = vals['filename'] (filename.png)
+                title           = vals['title'] (Host: 122_user_name/192.168.1.17)
+                dsfile          = vals['rrdfile'] (/path/to/rrdfile)
+                
+        """
+        
+        cur_date = time.strftime('%m/%d/%Y %H\:%M\:%S', time.localtime())
 
-        if (legend is None):
-            legend = "Host Traffic"
-        else:
-            legend = legend
-            
-        end_time = 'now'
-        ds_name = 'test'
-        width = '400'
-        height = '150'
-        cur_date = time.strftime('%m/%d/%Y %H\:%M\:%S', time.localtime())       
-        cmd_graph = 'rrdtool graph ' + output_filename + \
-            ' DEF:' + ds_name + '=' + self.rrd_name + ':' + ds_name + ':AVERAGE' + \
-            ' AREA:' + ds_name + '#FF0000' + \
-            ' VDEF:' + ds_name + 'last=' + ds_name + ',LAST' + \
-            ' VDEF:' + ds_name + 'avg=' + ds_name + ',AVERAGE' + \
-            ' COMMENT:"' + cur_date + '"' + \
-            ' GPRINT:' + ds_name + 'avg:"                         average=%6.2lf%S"' + \
-            ' --title="' + legend +'"' + \
-            ' --vertical-label="' + self.vertical_label + '"' \
-            ' --start=' + start_time + \
-            ' --end=' + end_time + \
-            ' --width=' + width + \
-            ' --height=' + height + \
-            ' --lower-limit="0"'
-        cmd = os.popen4(cmd_graph)
+        graphtype       = vals['graphtype']
+        filename        = vals['filename']
+        title           = vals['title']
+        dsfile          = vals['rrdfile']
+
+        cmd_graph = ('rrdtool graph ' + filename,
+                    ' --start=-1' + graphtype,
+                    ' --title="' + title + '"',
+                    ' --lazy',
+                    ' --height=80',
+                    ' --width=600',
+                    ' --lower-limit=0',
+                    ' --imgformat="PNG"',
+                    ' --vertical-label=bytes/sec',
+                    ' DEF:in="' + dsfile + ':in:AVERAGE"',
+                    ' DEF:out="' + dsfile + ':out:AVERAGE"',
+                    ' CDEF:out_neg=out,-1,*,',
+                    ' AREA:in#32CD32:Incoming',
+                    ' LINE1:in#336600',
+                    ' GPRINT:in:MAX:"Max\\: %8.2lf %s"',
+                    ' GPRINT:in:AVERAGE:"Avg\\: %8.2lf %S"',
+                    ' GPRINT:in:LAST:"Current\\: %8.2lf %Sbytes/sec\\n"',
+                    ' AREA:out_neg#4169E1:Outgoing',
+                    ' LINE1:out_neg#0033CC',
+                    ' GPRINT:out:MAX:"Max\\: %8.2lf %S"',
+                    ' GPRINT:out:AVERAGE:"Avg\\: %8.2lf %S"',
+                    ' GPRINT:out:LAST:"Current\\: %8.2lf %Sbytes/sec\\n"',
+                    ' HRULE:0#000000',
+                     )
+        cmdline = ' '.join(cmd_graph)
+
+        cmd = os.popen4(cmdline)
         for fd in cmd: fd.close()
-            
+
             
 class RRDException(Exception): pass

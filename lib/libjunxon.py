@@ -206,10 +206,13 @@ class Junxon:
                 eachsub.save()
         
 
-    def xr_addhost(self, macaddress, hostname, ipaddress):
+    def xr_addhost(self, macaddress, hostname, ipaddress, oid=None):
 
         xrd = XRoad()
-        xrd.addhost(macaddress, hostname, ipaddress)
+        xrd.addhost(macaddress, hostname, ipaddress, oid)
+        if (oid is not None):
+            xrd.markhost(str(oid), ipaddress)
+        
         return True
         
         

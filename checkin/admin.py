@@ -15,7 +15,7 @@ import Pyro.naming, Pyro.core
 import re
 
 class SubscriberAdmin(admin.ModelAdmin):
-    list_display = ('name','email','mobile','active', 'expires')
+    list_display = ('name','email','mobile','active', 'expires', 'view_report')
     ordering = ['-requested']
     list_per_page = 50
     search_fields = ['name','email','mobile']
@@ -48,7 +48,7 @@ class SubscriberAdmin(admin.ModelAdmin):
                 pre = re.compile('(\W+)')
                 _hostname = pre.sub('_', obj.name.lower())
                 _hostname = str(obj.id) + '_' + _hostname
-                j.xr_addhost(obj.macaddress, _hostname, obj.ipaddress)
+                j.xr_addhost(obj.macaddress, _hostname, obj.ipaddress, str(obj.id))
 
         if (obj.active == False):
             if ((obj.macaddress is not None) and (j.is_mac_dhcped(obj.macaddress))):
@@ -58,6 +58,11 @@ class SubscriberAdmin(admin.ModelAdmin):
         obj.approved = request.user
         obj.save()
         
+    def view_report(self, obj):
+        url_report =  '<a href="javascript:void(0)" onClick="window.open(\'http://192.168.1.200/junxon/%d/daily.png\', \'view_report\', \'width=700,height=200,menubar=no,status=no\')">View</a>' % (obj.id)
+        return url_report
 
+    view_report.allow_tags = True
+    view_report.short_description = 'Usage Report'
 
 admin.site.register(Subscriber, SubscriberAdmin)

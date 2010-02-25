@@ -15,6 +15,9 @@ export DJANGO_SETTINGS_MODULE=settings
 # Restart Pyro NS - TODO 
 /etc/init.d/pyro-nsd restart
 
+# Flush all at commands, as they'll be recreated by junxond.py
+for a in `atq|awk '{ print $1 }'`; do atrm $a; done
+
 # Start junxond.py
 /opt/junxon/server/junxond.py restart
 
@@ -28,7 +31,14 @@ export DJANGO_SETTINGS_MODULE=settings
 # Init Rules
 /sbin/iptables -t nat -I PREROUTING -p tcp --dport 80 -j DNAT --to 192.168.1.200 # Redirect all incoming packets
 
+# Create new chains
+/sbin/iptables -t mangle -N in_traffic
+/sbin/iptables -t mangle -N out_traffic
+
+# Push all traffic
+/sbin/iptables -t mangle -A FORWARD -s 192.168.1.0/24 -j out_traffic
+/sbin/iptables -t mangle -A FORWARD -d 192.168.1.0/24 -j in_traffic
+
 # Enable packet forwarding
 echo 1 > /proc/sys/net/ipv4/ip_forward
-
 

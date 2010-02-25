@@ -18,7 +18,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
 
-import os
+import os, sys
 import re
 import subprocess
 
@@ -152,7 +152,7 @@ class Table:
 		status = p.wait()
 		# check exit status
 		if not os.WIFEXITED(status) or os.WEXITSTATUS(status):
-			if not re.match(r'iptables: Chain already exists', err):
-				raise IptablesError(cmd, err)
+                        if not re.match(r'iptables: Chain already exists', err):
+                                raise IptablesError(cmd, err)
 		return out.splitlines(True)
 

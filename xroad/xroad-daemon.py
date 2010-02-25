@@ -45,11 +45,15 @@ class XRoadD:
     def updator(self):
         self.x.updreading()
 
+    def gengraphs(self):
+        self.x.gengraphs()
+        
+
 xrd = daemon.Daemon(
                 stdin="/dev/null",
                 stdout=settings.logfile,
                 stderr=settings.logfile,
-                pidfile="/var/run/xroad.pid",
+                pidfile=settings.pidfile,
                 user="root"
                 )
 
@@ -62,3 +66,4 @@ if __name__ == "__main__":
         while True:
             x.updator()
             time.sleep(10)
+            x.gengraphs()

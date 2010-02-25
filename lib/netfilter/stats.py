@@ -37,9 +37,15 @@ class Readings:
         self._iptables = 'iptables'
         self.table = "mangle"
 
-    def getstats(self):
-        rules = self._listrules()
-        expr = re.compile("^\s+\d+\s+(\d+).*MAC\s+([\d\w:]+).*set\s+.*$")
+    def getstats(self, dirn="in"):
+        if (dirn == "out"):
+            rules = self._listrules_out()
+        else:
+            rules = self._listrules_in()            
+        #         expr = re.compile("^\s+\d+\s+(\d+).*MAC\s+([\d\w:]+).*set\s+.*$")
+        # 441   518186 CONNMARK   all  --  *      *       0.0.0.0/0            192.168.1.17        CONNMARK xset 0x16/0xffffffff 
+        # 463    46097 CONNMARK   all  --  *      *       192.168.1.17         0.0.0.0/0           CONNMARK xset 0x16/0xffffffff 
+        expr = re.compile("^\s+\d+\s+(\d+)\s+CONNMARK\s+.*?CONNMARK\s+xset\s+(0x\d+)/.*$")
         readings = {}
         for r in rules:
             if ((r.find("Chain") >= 0) or (r.find("pkts") >= 0) or (r.find("Zeroing") >= 0)):
@@ -48,14 +54,23 @@ class Readings:
                 m = re.findall(expr, r)
                 if ((len(m) == 1) and (len(m[0]) == 2)):
                     match = m[0]
-                    readings[match[1]] = int(match[0])
+                    readings[int(match[1], 0)] = int(match[0])
         return readings
 
-    def _listrules(self):
+    def _listrules_in(self):
         _cmd = [self._iptables, "-t", self.table]
         if (self.zero is True):
             _cmd.append("-Z")
-        _cmd.extend(("-L",self.chain))
+        _cmd.extend(("-L", "in_traffic"))
+        _cmd.extend(("-n","-v","-x"))
+        result = self.__run(_cmd)
+        return result
+
+    def _listrules_out(self):
+        _cmd = [self._iptables, "-t", self.table]
+        if (self.zero is True):
+            _cmd.append("-Z")
+        _cmd.extend(("-L", "out_traffic"))
         _cmd.extend(("-n","-v","-x"))
         result = self.__run(_cmd)
         return result
@@ -73,4 +88,4 @@ class Readings:
 
 if __name__ == "__main__":
     r = Readings()
-    print r._getstats()
+    print r.getstats("out")

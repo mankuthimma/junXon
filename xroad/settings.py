@@ -29,7 +29,7 @@ db              = junxonpath + "/cache/hosts.db"
 interface       = "eth0"
 rrdlib          = junxonpath + "/lib/rrdpy/"
 rrdroot         = junxonpath + "/cache/flowdata/"
-rrdpng          = junxonpath + "/cache/png/"
+rrdpng          = "/var/www/junxon/"
 rrdinterval     = 60
 logfile         = junxonpath+"/log/xroad.log"
-
+pidfile         = "/var/run/xroad.pid"
