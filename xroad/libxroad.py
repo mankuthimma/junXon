@@ -71,7 +71,7 @@ class XRoad:
         macaddress = macaddress.upper()
         hostname   = hostname.upper()
         # Remove if record pertaining to macaddress already exists
-        self.remhost(macaddress)
+        self.remhost(ipaddress, int(idnum))
 
         _sql_ = "INSERT INTO hosts (id, hostname, macaddress, ipaddress) VALUES (%d, '%s', '%s', '%s')" % (int(idnum), hostname, macaddress, ipaddress)
         c = self.cx.cursor()
@@ -88,11 +88,13 @@ class XRoad:
             r.create_rrd(settings.rrdinterval)
         return True
 
-    def remhost(self, macaddress=None):
+    def remhost(self, ipaddress=None, oid=None):
         """ Remove host that is being monitored currently """
 
-        macaddress = macaddress.upper()
-        _sql_ = "DELETE FROM hosts WHERE macaddress='"+macaddress+"'"
+        self.unmarkhost(oid, ipaddress)
+        
+        #         macaddress = macaddress.upper()
+        _sql_ = "DELETE FROM hosts WHERE id=%d" % (oid)
         c = self.cx.cursor()
         c.execute(_sql_)
         self.cx.commit()
@@ -237,25 +239,4 @@ class XRoad:
 
 if __name__ == "__main__":
     x = XRoad()
-    x.gengraphs()
-    #     x.initdb()
-    #     x.addhost("woodlice","aa:bb:cc:dd:ee:ff")
-#     x.markhost(3, "aa:bb:cc:dd:ee:ff")
-    #x.updreading()
-    #     x.gengraph("aa:bb:cc:dd:ee:ff")
-#     systems = {}
-#     systems['caterpillar']  = '00:15:f2:bc:97:49'
-#     systems['roadhog']      = '00:17:31:32:de:3f'
-#     systems['cockatoo']     = '00:17:31:31:3f:94'
-#     systems['balderdash']   = '00:17:31:31:3f:95'
-#     systems['rhizopod']     = '00:17:31:31:3f:93'
-#     systems['spitfire']     = '00:17:31:31:3f:83'
-#     systems['eel']          = '00:16:6f:8a:96:b0'
-#     j=1
-#     for i in systems.keys():
-#         #         x.markhost(j, systems[i])
-#         x.gengraph(systems[i])
-#         j+=1
-
-
-
+#     x.gengraphs()

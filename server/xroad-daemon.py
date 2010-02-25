@@ -22,7 +22,7 @@
 ## Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 ##
 
-import settings
+from xroad import settings
 import sys, time
 import daemon
 

@@ -20,6 +20,7 @@ for a in `atq|awk '{ print $1 }'`; do atrm $a; done
 
 # Start junxond.py
 /opt/junxon/server/junxond.py restart
+/opt/junxon/server/xroad-daemon.py restart
 
 # Setup Netfilter Rules
 

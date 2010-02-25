@@ -8,12 +8,13 @@
 ## Copyright (C) 2010 INFORMEDIA TECHNOLOGIES (MYSORE) PRIVATE LIMITED
 ##
 
-junxonpath = ("/opt/","/opt/junxon","/opt/junxon/lib")          # HACK-ALERT!!! Move this to config - shashi
+junxonpath = ("/opt/","/opt/junxon","/opt/junxon/lib","/opt/junxon/xroad")          # HACK-ALERT!!! Move this to config - shashi
 import sys
 sys.path.extend(junxonpath)
 
 from optparse import OptionParser
 from libjunxon import Junxon
+from libxroad import XRoad
 
 from junxon.checkin.models import Subscriber
 
@@ -21,6 +22,7 @@ class JunxonUtil:
 
     def __init__(self, ipaddress, macaddress):
         self.j = Junxon()
+        self.x = XRoad()
         self.ipaddress = ipaddress
         self.macaddress = macaddress
 
@@ -30,11 +32,11 @@ class JunxonUtil:
         
         sub = Subscriber.objects.filter(macaddress=self.macaddress, ipaddress=self.ipaddress, active=True)
         for s in sub:
+            self.x.remhost(self.ipaddress, s.id) # Stop host from being monitored
             s.active=False
             s.save()
         return True
     
-        
 
 def main():
     """ Tool to disconnect active hosts """
