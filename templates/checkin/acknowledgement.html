@@ -1,18 +1,64 @@
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
-<html>
-<head>
-<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-15">
-<title>Acknowledgement</title>
-</head>
+{% extends "checkin/base_site.html" %}
+{% load i18n %}
 
-<body>
-<div align="center">
-  <h4>Please note your key</h4>
-  <h1>{{ subscriber.accesskey }}</h1>
+{% block stylesheet %}{% load adminmedia %}{% admin_media_prefix %}css/forms.css{% endblock %}
+
+{% block coltype %}colM{% endblock %}
+
+{% block bodyclass %}dashboard{% endblock %}
+
+{% block breadcrumbs %}{% endblock %}
+
+{% block content %}
+<div id="content" class="colM">
+<div id="content-main">
+
+  <h1>Thank you for the information!</h1>
+  <h3>Here's what you've told us ...</h3>
+  <form action="/checkin/register" method="post">
+        <div>
+          <fieldset class="module aligned">
+        <div class="form-row name">
+          <div>
+            <label class="required" for="id_name">Name:</label>
+            {{ subscriber.name }}
+          </div>
+        </div>
+        <div class="form-row name">
+          <div>
+            <label class="required" for="id_email">Email:</label>
+            {{ subscriber.email }}            
+          </div>
+        </div>
+
+        <div class="form-row name">
+          <div>
+            <label class="required" for="id_mobile">Mobile:</label>
+            {{ subscriber.mobile }}
+          </div>
+        </div>
+            
+        <div class="form-row name">
+          <div>
+            <label class="required" for="id_remarks">Remarks:</label>
+          </div>
+          <div>
+            {{ subscriber.remarks }}            
+          </div>
+        </div>
+        </fieldset>
+        </div>
+
 </div>
+</div>
+{% endblock %}
 
-
-<hr>
-<address></address>
-<!-- hhmts start -->Last modified: Thu Feb 11 16:19:48 IST 2010 <!-- hhmts end -->
-</body> </html>
+{% block sidebar %}
+<div id="content-related">
+    <div class="module" id="recent-actions-module">
+      <h2>{% trans 'Next Steps' %}</h2>
+      <p>Your information needs to be screened before approval.</p>
+      <p>You can contact the support on 0821 4288765 </p>
+    </div>
+</div>
+{% endblock %}

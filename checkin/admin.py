@@ -59,7 +59,7 @@ class SubscriberAdmin(admin.ModelAdmin):
         obj.save()
         
     def view_report(self, obj):
-        url_report =  '<a href="javascript:void(0)" onClick="window.open(\'http://192.168.1.200/junxon/%d/daily.png\', \'view_report\', \'width=700,height=200,menubar=no,status=no\')">View</a>' % (obj.id)
+        url_report =  '<a href="javascript:void(0)" onClick="window.open(\'http://192.168.1.200/junxon/%d/daily.png\', \'view_report\', \'width=700,height=200,menubar=no,status=no\')">View Report</a>' % (obj.id)
         return url_report
 
     view_report.allow_tags = True

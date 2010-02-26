@@ -5,10 +5,9 @@ from django.contrib import admin
 admin.autodiscover()
 
 urlpatterns = patterns('',
-    # Example:
-    # (r'^junxon/', include('junxon.foo.urls')),
-    (r'^checkin/', 'junxon.checkin.views.register'), 
+                       (r'^checkin/', 'junxon.checkin.views.register'), 
+                       (r'^admin/(.*)', admin.site.root),
+                       (r'^media/(?P<path>.*)$', 'django.views.static.serve', {'document_root': '/opt/junxon/media'}),
+                       )
 
-    # Uncomment the next line to enable the admin:
-    (r'^admin/(.*)', admin.site.root),
-)
+

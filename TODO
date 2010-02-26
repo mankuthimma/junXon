@@ -1,10 +1,7 @@
 1. In junxond, initialize hosts from the database - add them to NAT table. - Completed in ef71033ce358f353f2be92c0b924c0cde63a6b57 commit
-2. Integrate XRoad with  junxond
-3. Write installer
-4. Design proper templates
+2. Integrate XRoad with  junxond - Completed
+3. Design proper templates
+4. Write installer
 5. Test with various modes
 6. Visited websites monitor
 
-RRD for junXon Hosts:
-
-1. 10 minutes is too long an interval. Ideally the tracking must happen every minute

@@ -1,17 +1,66 @@
-<!-- register.html -->
+{% extends "checkin/base_site.html" %}
+{% load i18n %}
 
-<h1>Go on and register</h1>
+{% block stylesheet %}{% load adminmedia %}{% admin_media_prefix %}css/forms.css{% endblock %}
 
-<form action="/checkin/register" method="post">
-Name: <input type="TEXT" name="name" size="50"><br>
-Email: <input type="TEXT" name="email" size="50"><br>
-Mobile: <input type="TEXT" name="mobile" size="10"><br>
-Remarks: <br>
-<textarea name="remarks" rows="5" cols="30"></textarea><br>
+{% block coltype %}colM{% endblock %}
 
+{% block bodyclass %}dashboard{% endblock %}
 
-<input type="SUBMIT" value="  Register  ">
-</form>
+{% block breadcrumbs %}{% endblock %}
 
+{% block content %}
+<div id="content" class="colM">
+<div id="content-main">
 
+  <h1>Go on and register</h1>  
+  <form action="/checkin/register" method="post">
+        <div>
+          <fieldset class="module aligned">
+        <div class="form-row name">
+          <div>
+            <label class="required" for="id_name">Name:</label>
+            <input id="id_name" class="vTextField" type="text" maxlength="255" value="" name="name"/>
+          </div>
+        </div>
+        <div class="form-row name">
+          <div>
+            <label class="required" for="id_email">Email:</label>
+            <input id="id_email" class="vTextField" type="text" maxlength="255" value="" name="email"/>
+          </div>
+        </div>
 
+        <div class="form-row name">
+          <div>
+            <label class="required" for="id_mobile">Mobile:</label>
+            <input id="id_mobile" class="vTextField" type="text" maxlength="255" value="" name="mobile"/>            
+          </div>
+        </div>
+            
+        <div class="form-row name">
+          <div>
+            <label class="required" for="id_remarks">Remarks:</label>
+          </div>
+          <div>
+            <textarea id="id_remarks" class="vTextField" name="remarks" rows="5" cols="30"></textarea>
+          </div>
+        </div>
+        <div class="submit-row">
+          <input class="default" type="SUBMIT" value="  Register  ">
+        </div>
+
+        </fieldset>
+        </div>
+        </form>  
+</div>
+</div>
+{% endblock %}
+
+{% block sidebar %}
+<div id="content-related">
+    <div class="module" id="recent-actions-module">
+      <h2>{% trans 'Connect Wifi' %}</h2>
+      <p>You can access this Wifi HotSpot once you register and  our support people approve your request.</p>
+    </div>
+</div>
+{% endblock %}
