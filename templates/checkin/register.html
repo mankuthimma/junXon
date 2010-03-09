@@ -13,36 +13,40 @@
 <div id="content" class="colM">
 <div id="content-main">
 
-  <h1>Go on and register</h1>  
+  <h1>Go on and register</h1>
   <form action="/checkin/register" method="post">
         <div>
           <fieldset class="module aligned">
         <div class="form-row name">
+          {{ form.name.errors }}          
           <div>
             <label class="required" for="id_name">Name:</label>
-            <input id="id_name" class="vTextField" type="text" maxlength="255" value="" name="name"/>
+            <input id="id_name" class="vTextField" type="text" maxlength="255" value="{{ form.name.data }}" name="name"/>
           </div>
         </div>
         <div class="form-row name">
+          {{ form.email.errors }}                      
           <div>
             <label class="required" for="id_email">Email:</label>
-            <input id="id_email" class="vTextField" type="text" maxlength="255" value="" name="email"/>
+            <input id="id_email" class="vTextField" type="text" maxlength="255" value="{{ form.email.data }}" name="email"/>
           </div>
         </div>
 
         <div class="form-row name">
+          {{ form.mobile.errors }}                      
           <div>
             <label class="required" for="id_mobile">Mobile:</label>
-            <input id="id_mobile" class="vTextField" type="text" maxlength="255" value="" name="mobile"/>            
+            <input id="id_mobile" class="vTextField" type="text" maxlength="255" value="{{ form.mobile.data }}" name="mobile"/>            
           </div>
         </div>
             
         <div class="form-row name">
+          {{ form.remarks.errors }}          
           <div>
             <label class="required" for="id_remarks">Remarks:</label>
           </div>
           <div>
-            <textarea id="id_remarks" class="vTextField" name="remarks" rows="5" cols="30"></textarea>
+            <textarea id="id_remarks" class="vTextField" name="remarks" rows="5" cols="30">{{ form.remarks.data }}</textarea>
           </div>
         </div>
         <div class="submit-row">

@@ -1,5 +1,6 @@
 from django.db import models
 from django.forms import ModelForm
+from django.forms import Textarea
 from django.contrib.auth.models import User
 
 TYPES = (
@@ -10,20 +11,20 @@ TYPES = (
     )
 
 class Subscriber(models.Model):
-    name        = models.CharField(max_length=255)
-    email       = models.EmailField()
-    mobile      = models.CharField(max_length=12)
-    remarks     = models.CharField(max_length=255)
-    accesskey   = models.CharField(max_length=8, blank=True)
-    ipaddress   = models.IPAddressField(blank=True)
-    macaddress  = models.CharField(max_length=18, blank=True)
+    name        = models.CharField("Full Name", max_length=255)
+    email       = models.EmailField("Email")
+    mobile      = models.CharField("Mobile", max_length=12)
+    remarks     = models.CharField("Remarks", max_length=255)
+    accesskey   = models.CharField("Access Key", max_length=8, blank=True)
+    ipaddress   = models.IPAddressField("IP Address", blank=True)
+    macaddress  = models.CharField("MAC Address", max_length=18, blank=True)
     # Faced issues while using the ForeignKey with reco, approved
-    recommended = models.CharField(max_length=255, editable=True)
-    approved    = models.CharField(max_length=255, editable=False) 
-    active      = models.BooleanField(default=False)
+    recommended = models.CharField("Recommended by", max_length=255, editable=True)
+    approved    = models.CharField("Approved by", max_length=255, editable=False) 
+    active      = models.BooleanField("Active?", default=False)
     requested   = models.DateTimeField(auto_now=True, editable=False)
-    starts      = models.DateTimeField(blank=True, null=True)
-    expires     = models.DateTimeField(blank=True, null=True)
+    starts      = models.DateTimeField("Starts on", blank=True, null=True)
+    expires     = models.DateTimeField("Expires on", blank=True, null=True)
     
 
     def __unicode__(self):
@@ -33,6 +34,9 @@ class SubscriberForm(ModelForm):
     class Meta:
         model = Subscriber
         exclude = ('ipaddress', 'macaddress', 'approvedby', 'recommended')
-        
+        widgets = {
+            'remarks': Textarea(attrs={'cols': 80, 'rows': 20}),
+            }
+
 
 

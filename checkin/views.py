@@ -36,9 +36,14 @@ def register(request):
             ip = "127.0.0.1"
         subscriber = Subscriber(ipaddress=ip, macaddress=mac)
         form = SubscriberForm(request.POST, instance=subscriber)
-        form.save(commit=False)
-        subscriber.accesskey = ''.join([choice(strings) for i in range(8)])
-        subscriber.save()
-        return render_to_response('checkin/acknowledgement.html', {'subscriber': subscriber, 'ip': ip, 'mac': mac})
+        if (form.is_valid()):
+            form.save(commit=False)
+            subscriber.accesskey = ''.join([choice(strings) for i in range(8)])
+            subscriber.save()
+            return render_to_response('checkin/acknowledgement.html', {'subscriber': subscriber, 'ip': ip, 'mac': mac})
+        else:
+            return render_to_response('checkin/register.html', {
+                'form': form,
+                }) 
     
 
