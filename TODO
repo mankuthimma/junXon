@@ -1,6 +1,6 @@
 1. In junxond, initialize hosts from the database - add them to NAT table. - Completed in ef71033ce358f353f2be92c0b924c0cde63a6b57 commit
 2. Integrate XRoad with  junxond - Completed
-3. Design proper templates
+3. Design proper templates - Somewhat proper - Completed
 4. Write installer
 5. Test with various modes
 6. Visited websites monitor

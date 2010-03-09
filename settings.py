@@ -54,7 +54,7 @@ MEDIA_URL = ''
 # URL prefix for admin media -- CSS, JavaScript and images. Make sure to use a
 # trailing slash.
 # Examples: "http://foo.com/media/", "/media/".
-ADMIN_MEDIA_PREFIX = '/admin-media/'
+ADMIN_MEDIA_PREFIX = '/media/'
 
 # Make this unique, and don't share it with anybody.
 SECRET_KEY = 'imxc*(6rvp*axz%azyd%q+vyb@+dweg!%^v!09s**o#-#%)6w%'
@@ -85,3 +85,5 @@ INSTALLED_APPS = (
     'django.contrib.admin',
     'junxon.checkin',
 )
+
+FORCE_SCRIPT_NAME=''

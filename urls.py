@@ -8,6 +8,7 @@ urlpatterns = patterns('',
                        (r'^checkin/', 'junxon.checkin.views.register'), 
                        (r'^admin/(.*)', admin.site.root),
                        (r'^media/(?P<path>.*)$', 'django.views.static.serve', {'document_root': '/opt/junxon/media'}),
+		       (r'^.*$', 'junxon.checkin.views.register'), 
                        )
 
 
