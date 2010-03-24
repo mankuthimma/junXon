@@ -39,18 +39,27 @@
             <input id="id_mobile" class="vTextField" type="text" maxlength="255" value="{{ form.mobile.data }}" name="mobile"/>            
           </div>
         </div>
-            
+
+        <div class="form-row name">
+          {{ form.company.errors }}                      
+          <div>
+            <label class="required" for="id_company">Company:</label>
+            <input id="id_company" class="vTextField" type="text" maxlength="255" value="{{ form.company.data }}" name="company"/> 
+          </div>
+        </div>
+
+        
         <div class="form-row name">
           {{ form.remarks.errors }}          
           <div>
-            <label class="required" for="id_remarks">Remarks:</label>
+            <label class="required" for="id_remarks">Project details with work order number / Remarks:</label>
           </div>
           <div>
             <textarea id="id_remarks" class="vTextField" name="remarks" rows="5" cols="30">{{ form.remarks.data }}</textarea>
           </div>
         </div>
         <div class="submit-row">
-          <input class="default" type="SUBMIT" value="  Register  ">
+          <input class="default" type="SUBMIT" value="  Request Connection  ">
         </div>
 
         </fieldset>
@@ -64,7 +73,7 @@
 <div id="content-related">
     <div class="module" id="recent-actions-module">
       <h2>{% trans 'Connect Wifi' %}</h2>
-      <p>You can access this Wifi HotSpot once you register and  our support people approve your request.</p>
+      <p>Please enter your information in the form and submit request. You can access this Wifi HotSpot once our support people approve your request.</p>
     </div>
 </div>
 {% endblock %}

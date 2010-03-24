@@ -37,10 +37,18 @@
             {{ subscriber.mobile }}
           </div>
         </div>
-            
+
         <div class="form-row name">
           <div>
-            <label class="required" for="id_remarks">Remarks:</label>
+            <label class="required" for="id_company">Company:</label>
+            {{ subscriber.company }}
+          </div>
+        </div>
+        
+        
+        <div class="form-row name">
+          <div>
+            <label class="required" for="id_remarks">Project details with work order number / Remarks:</label>
           </div>
           <div>
             {{ subscriber.remarks }}            
@@ -58,7 +66,7 @@
     <div class="module" id="recent-actions-module">
       <h2>{% trans 'Next Steps' %}</h2>
       <p>Your information needs to be screened before approval.</p>
-      <p>You can contact the support on 0821 4288765 </p>
+      <p> </p>
     </div>
 </div>
 {% endblock %}
