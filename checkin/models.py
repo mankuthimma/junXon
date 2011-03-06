@@ -20,7 +20,7 @@ class Subscriber(models.Model):
     ipaddress   = models.IPAddressField("IP Address", default="127.0.0.1", blank=True)
     macaddress  = models.CharField("MAC Address", max_length=18, blank=True)
     # Faced issues while using the ForeignKey with reco, approved
-    recommended = models.CharField("JSW Coordinator / Recommended by", max_length=255, editable=True)
+    recommended = models.CharField("Facilities Coordinator / Recommended by", max_length=255, editable=True)
     approved    = models.CharField("Approved by", max_length=255, editable=False) 
     active      = models.BooleanField("Active?", default=False)
     requested   = models.DateTimeField(auto_now=True, editable=False)
