@@ -18,7 +18,7 @@ ADMINS = (
 MANAGERS = ADMINS
 
 DATABASE_ENGINE = 'mysql'           # 'postgresql_psycopg2', 'postgresql', 'mysql', 'sqlite3' or 'oracle'.
-DATABASE_NAME = 'junxondb'             # Or path to database file if using sqlite3.
+DATABASE_NAME = 'junxon2db'             # Or path to database file if using sqlite3.
 DATABASE_USER = 'junxon'             # Not used with sqlite3.
 DATABASE_PASSWORD = 'junxon'         # Not used with sqlite3.
 DATABASE_HOST = 'localhost'             # Set to empty string for localhost. Not used with sqlite3.
@@ -49,7 +49,7 @@ ADMIN_MEDIA_ROOT = '/opt/junxon/media/'
 # URL that handles the media served from MEDIA_ROOT. Make sure to use a
 # trailing slash if there is a path component (optional in other cases).
 # Examples: "http://media.lawrence.com", "http://example.com/media/"
-MEDIA_URL = ''
+MEDIA_URL = '/media/'
 
 # URL prefix for admin media -- CSS, JavaScript and images. Make sure to use a
 # trailing slash.
@@ -87,3 +87,7 @@ INSTALLED_APPS = (
 )
 
 FORCE_SCRIPT_NAME=''
+
+AUTHENTICATION_BACKENDS = ('django.contrib.auth.backends.ModelBackend', 'junxon.lib.junxonauth.JunxonBackend',)
+
+# AUTHENTICATION_BACKENDS = ('junxon.lib.junxonauth.JunxonBackend',)

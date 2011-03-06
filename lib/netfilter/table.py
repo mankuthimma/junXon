@@ -100,6 +100,7 @@ class Table:
 		self.__run_iptables(['-P', chainname, policy])
 	
 	def append_rule(self, chainname, rule):
+
 		"""Appends a Rule to the specified chain.
 		"""
 		self.__run_iptables(['-A', chainname] + rule.specbits())
@@ -135,6 +136,7 @@ class Table:
 	def __get_chains(self):
 		lines = self.__run([self.__iptables_save, '-t', self.__name, '-c'])
 		return netfilter.parser.parse_tables(lines)[self.__name]
+
 	
 	def __run_iptables(self, args):
 		cmd = [self.__iptables, '-t', self.__name] + args
@@ -155,4 +157,3 @@ class Table:
                         if not re.match(r'iptables: Chain already exists', err):
                                 raise IptablesError(cmd, err)
 		return out.splitlines(True)
-

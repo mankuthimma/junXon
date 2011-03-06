@@ -14,6 +14,11 @@
 <div id="content-main">
 
   <h1>Go on and register</h1>
+    <div class="module" id="recent-actions-module">
+      <h2>{% trans 'Connect Wifi' %}</h2>
+      <p>Please enter your information in the form and submit request. You can access this Wifi HotSpot once concerned JSW Project Head and Admin Head approves it.</p>
+    </div>
+
   <form action="/checkin/register" method="post">
         <div>
           <fieldset class="module aligned">
@@ -71,9 +76,5 @@
 
 {% block sidebar %}
 <div id="content-related">
-    <div class="module" id="recent-actions-module">
-      <h2>{% trans 'Connect Wifi' %}</h2>
-      <p>Please enter your information in the form and submit request. You can access this Wifi HotSpot once our support people approve your request.</p>
-    </div>
 </div>
 {% endblock %}

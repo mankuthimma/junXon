@@ -140,3 +140,13 @@ a.deletelink:hover { color:#993333; }
 /* OBJECT HISTORY */
 table#change-history { width:100%; }
 table#change-history tbody th { width:16em; }
+
+.status { width: 650px; margin: 2em; }
+.status h3 { text-align: left; border-bottom: 2px solid #666; }
+.status #connect_status_on { color: #cc3434; padding: 1em; font-size: 18px; font-weight: bold;  }
+.status #connect_status_off {  color: #34cc34; padding: 1em; font-size: 18px; font-weight: bold;  }
+.status .status_graph { padding: 0px; margin-top: 1.5em; border: 2px solid rgb(0,0,0); }
+.status td { font-size: 12pt; color: #222; font-weight: bold;  padding: 1em; }
+.status td.label { font-size: 10pt; color: #666; font-weight: normal;}
+.status .instruct { color: #5b80b2; background: #ddd;  padding: 0.5em; }
+.status .instruct h4 { font-size: 14px; text-decoration: underline; text-align: center; }

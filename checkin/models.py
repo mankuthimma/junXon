@@ -17,7 +17,7 @@ class Subscriber(models.Model):
     company     = models.CharField("Company", max_length=255)
     remarks     = models.CharField("Project details with work order number / Remarks", max_length=255)
     accesskey   = models.CharField("Access Key", max_length=8, blank=True)
-    ipaddress   = models.IPAddressField("IP Address", blank=True)
+    ipaddress   = models.IPAddressField("IP Address", default="127.0.0.1", blank=True)
     macaddress  = models.CharField("MAC Address", max_length=18, blank=True)
     # Faced issues while using the ForeignKey with reco, approved
     recommended = models.CharField("JSW Coordinator / Recommended by", max_length=255, editable=True)
@@ -38,6 +38,3 @@ class SubscriberForm(ModelForm):
         widgets = {
             'remarks': Textarea(attrs={'cols': 80, 'rows': 20}),
             }
-
-
-

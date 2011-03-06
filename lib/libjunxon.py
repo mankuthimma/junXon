@@ -29,16 +29,16 @@ class Junxon:
         """ TODO: Move configuration params to a configfile """
         self._dhcpd_conf = "/opt/junxon/cache/dhcpd.conf"
         self._dhcpd_init = "/etc/init.d/dhcp3-server"
-        self.ip_pool = "192.168.1."
+        self.ip_pool = "192.168.9."
 
     def get_mac_address(self, ip):
         # TODO: interface should be configured in settings
-        ans,unans = srp(Ether(dst="ff:ff:ff:ff:ff:ff")/ARP(pdst=ip),timeout=3,iface="eth0")
+        ans,unans = srp(Ether(dst="ff:ff:ff:ff:ff:ff")/ARP(pdst=ip),timeout=3,iface="eth1")
         macaddress = ""
         for s,r in ans:
             macaddress = r.sprintf("%Ether.src%")
         return macaddress
-
+    
     def get_online_addresses(self, pool):
         ans,unans=srp(Ether(dst="ff:ff:ff:ff:ff:ff")/ARP(pdst=pool),timeout=2,iface="eth1")
         hosts = []
@@ -47,7 +47,6 @@ class Junxon:
             host_mac = r.sprintf("%Ether.src%")
             hosts.append((host_ip, host_mac))
         return hosts
-
 
     def gen_dhcpd_conf(self, ip, mac):
         if ((not self.is_ip_dhcped(ip)) and (not self.is_mac_dhcped(mac))):
@@ -185,6 +184,14 @@ class Junxon:
         sys.stdout.write("Disabling "+ipaddress+", Mac "+macaddress) 
         return True
 
+    def check_subscription(self, ipaddress):
+        table = Table('nat')
+        rules = table.list_rules('POSTROUTING')
+        for r in rules:
+            if (r.source == ipaddress):
+                return True
+        return False
+
     def call_at(self, when, ipaddress, macaddress):
         a = AtSet()
         a.at(when, ipaddress, macaddress)
@@ -192,6 +199,8 @@ class Junxon:
 
     def init_active(self):
         allsubs = Subscriber.objects.all()
+        self.xr_flushall()
+	
         for eachsub in allsubs:
             # Ignore disabled
             if (eachsub.active == False):
@@ -200,7 +209,12 @@ class Junxon:
             cur_time = datetime.datetime.today()
             if ((cur_time >= eachsub.starts) and (cur_time < eachsub.expires)):
                 self.disable_subscription(eachsub.ipaddress, eachsub.macaddress)
-                self.enable_subscription(eachsub.ipaddress, eachsub.macaddress, eachsub.expires.strftime('%I:%M%p %b %d'))
+## Disabling initial activation
+#                self.enable_subscription(eachsub.ipaddress, eachsub.macaddress, eachsub.expires.strftime('%I:%M%p %b %d'))
+                pre = re.compile('(\W+)')
+                _hostname = pre.sub('_', eachsub.name.lower())
+                _hostname = str(eachsub.id) + '_' + _hostname
+                self.xr_addhost(eachsub.macaddress, _hostname, eachsub.ipaddress, str(eachsub.id))
             else:
                 eachsub.active=False
                 eachsub.save()
@@ -214,12 +228,32 @@ class Junxon:
             xrd.markhost(str(oid), ipaddress)
         
         return True
+
+
+    def xr_flushall(self):
+        xrd = XRoad()
+        xrd.flushall()
+        return True
+
+    def xr_remhost(self, ipaddress, oid):
+
+        try:
+            xrd = XRoad()
+            xrd.remhost(ipaddress)
+            if (oid is not None):
+                xrd.unmarkhost(str(oid), ipaddress)
+        except Exception:
+            pass
         
+        return True
+
         
     
 if __name__=='__main__':
     
     j = Junxon()
+    print j.get_online_addresses("192.168.9.0/24")
+#    print j.check_subscription("192.168.9.177")
 #     j.xr_addhost("aa:bb:cc:dd:ee:ff", "16_pradeep_m", "192.168.1.17")
 #     j.init_active()
 #     print j.remove_subscription("192.168.1.9","aa:bb:cc:dd:ee:ee")

@@ -1,0 +1,63 @@
+{% extends "checkin/base.html" %}
+
+
+{% block content %}
+
+<script type="text/javascript">
+	function toggle_status() {
+		$.ajax({
+			url: '/toggle',
+			success: function(data) {
+					if (data == "disabled") {
+						$('#connect_status_off').hide('slow');
+						$('#connect_status_on').show('slow');
+					}
+					if (data == "enabled") {
+						$('#connect_status_on').hide('slow');
+						$('#connect_status_off').show('slow');
+					}
+
+				}
+		});
+	}
+</script>
+
+<div class="status" align="center">
+<h3>Welcome, {{ user }}</h3>
+
+<div id="connect_status_on" style="{% if connected %}display: none{% endif %};" class="connect_status">You are currently offline <input type="button" value="  Go Online  " name="connect_now" onClick="javascript: toggle_status();" /></div>
+<div id="connect_status_off" style="{% if not connected %}display:none{% endif %};" class="connect_status">You are currently online <input type="button" value="  Go Offline  " name="connect_now"  onClick="javascript: toggle_status();" /></div>
+
+
+<img alt="{{ user }}'s internet usage" src="/junxon/{{ user.id }}/daily.png" width="697px" height="168px" class="status_graph" />
+
+<table width="100%" border="0">
+<tr><td width="50%" valign="top"> 
+
+	<table width="100%">
+	<tr><td class="label" width="15%">Name:</td><td>{{ user.name }}</td></tr>
+	<tr><td class="label" width="15%">Email:</td><td>{{ user.email }}</td></tr>
+	<tr><td class="label" width="15%">Mobile:</td><td>{{ user.mobile }}</td></tr>
+	<tr><td class="label" width="15%">Company:</td><td>{{ user.company }}</td></tr>
+	<tr><td class="label" width="15%">Project/Remarks:</td><td>{{ user.remarks }}</td></tr>
+	</table>
+
+ </td>
+ <td width="50%" valign="top">
+
+	<div class="instruct">
+		<h4>Instructions</h4>
+		<ul>
+			<li><b>Do not close this window/tab</b></li>
+			<li>Your usage is updated for the past few days</li>
+			<li>By using this connection, you agree to the acceptable usage policy</li>
+			<li>For any queries, please contact</li>
+		</ul>
+	</div>	
+
+ </td></tr>
+</table>
+
+</div>
+
+{% endblock %}

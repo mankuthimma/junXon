@@ -152,7 +152,10 @@ class XRoad:
             idnum = h[0]
             rrd_file = settings.rrdroot + mac + ".rrd"
             r = rrd.RRD(rrd_file)
-            r.update(vals_in[idnum], vals_out[idnum])
+            try:
+                r.update(vals_in[idnum], vals_out[idnum])
+            except KeyError, e:
+                sys.stdout.write('Key not found: %s' % idnum) 
         return True
 
     def gengraphs(self):
@@ -225,8 +228,10 @@ class XRoad:
             xid = h[0]
             ipaddress = h[1]
             self.unmarkhost(xid, ipaddress)
+            _sql_ = "DELETE FROM hosts WHERE id='"+str(h[0])+"'"
+            c.execute(_sql_)
+            self.cx.commit()
 
-            
     def markall(self):
         _sql_ = "SELECT id, ipaddress  FROM hosts ORDER BY id"
         c = self.cx.cursor()
@@ -236,6 +241,8 @@ class XRoad:
             xid = h[0]
             ipaddress = h[1]
             self.markhost(xid, ipaddress)
+
+
 
 if __name__ == "__main__":
     x = XRoad()
